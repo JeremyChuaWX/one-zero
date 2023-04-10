@@ -12,7 +12,6 @@ use near_sdk::{
     AccountId, BorshStorageKey, PanicOnDefault,
 };
 
-// a pair of users going long and short by the same amount
 #[derive(BorshSerialize, BorshDeserialize, Debug, Clone)]
 struct SharePair {
     long: AccountId,
@@ -29,7 +28,6 @@ struct Market {
     shares: Vector<SharePair>,
 }
 
-// public view of the Market struct
 #[derive(Serialize)]
 #[serde(crate = "near_sdk::serde")]
 pub struct ViewMarket<'a> {
@@ -52,7 +50,6 @@ impl<'a> From<&'a Market> for ViewMarket<'a> {
     }
 }
 
-// basically an ad to look for matching half to create a SharePair
 #[derive(BorshSerialize, BorshDeserialize, Serialize, Deserialize, Debug, Clone)]
 #[serde(crate = "near_sdk::serde")]
 pub struct Offer {
