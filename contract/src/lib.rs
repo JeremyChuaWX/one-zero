@@ -1,8 +1,3 @@
-/*
-Questions:
-- for Contract.credit the LookupMap why not use U128? is it because we don't serialise/deserialise?
-*/
-
 use near_sdk::{
     borsh::{self, BorshDeserialize, BorshSerialize},
     env,
@@ -38,6 +33,14 @@ enum ContractEvent {
     },
     MarketClosed {
         market_id: u32,
+    },
+    Credited {
+        account_id: AccountId,
+        amount: u128,
+    },
+    Withdrawn {
+        account_id: AccountId,
+        amount: u128,
     },
     // TODO: Events for credits and withdrawals
 }
@@ -143,6 +146,11 @@ impl Contract {
     }
 
     fn credit_account(&mut self, account_id: AccountId, amount: u128) {
+        ContractEvent::Credited {
+            account_id: account_id.clone(),
+            amount,
+        }
+        .emit();
         *self.credit.entry(account_id).or_insert(0) += amount;
     }
 
@@ -152,6 +160,12 @@ impl Contract {
             .credit
             .remove(&predecessor)
             .unwrap_or_else(|| env::panic_str("You have no rewards to withdraw."));
+
+        ContractEvent::Withdrawn {
+            account_id: predecessor.clone(),
+            amount: amount.clone(),
+        }
+        .emit();
 
         Promise::new(predecessor).transfer(amount)
     }
