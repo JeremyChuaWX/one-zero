@@ -42,7 +42,6 @@ enum ContractEvent {
         account_id: AccountId,
         amount: u128,
     },
-    // TODO: Events for credits and withdrawals
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Debug, Clone)]
