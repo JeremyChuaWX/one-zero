@@ -11,23 +11,34 @@ Questions
 - how does await work? i want to deploy token contract, then execute further code after that
 */
 
-use near_contract_standards::non_fungible_token::metadata::TokenMetadata;
+use near_contract_standards::fungible_token::metadata::FungibleTokenMetadata;
 use near_sdk::{
     borsh::{self, BorshDeserialize, BorshSerialize},
     env,
     json_types::U128,
     near_bindgen, require,
     serde::{Deserialize, Serialize},
+    serde_json,
     store::UnorderedMap,
-    AccountId, BorshStorageKey, PanicOnDefault,
+    AccountId, BorshStorageKey, Gas, PanicOnDefault, Promise,
 };
 use near_sdk_contract_tools::{event, standard::nep297::Event};
 
-fn deploy_token() -> TokenMetadata {
-    /*
-    - take the included bytes of token contract and deploy the FT using the given metadata
-    */
-    todo!()
+const TOKEN_CONTRACT: &[u8] = include_bytes!("path/to/token/contract/here");
+const GAS: Gas = Gas(50_000_000_000_000);
+
+#[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
+#[serde(crate = "near_sdk::serde")]
+pub struct TokenArgs {
+    owner_id: AccountId,
+    total_supply: U128,
+    metadata: FungibleTokenMetadata,
+}
+
+fn deploy_token(args: &TokenArgs) {
+    Promise::new(env::current_account_id())
+        .deploy_contract(TOKEN_CONTRACT.to_vec())
+        .function_call("new".to_string(), serde_json::to_vec(args).unwrap(), 0, GAS);
 }
 
 #[event(standard = "x-one-zero", version = "0.1.0", serde = "near_sdk::serde")]
@@ -44,7 +55,6 @@ enum ContractEvent {
         market_id: u32,
         owner: AccountId,
     },
-
     OfferCreated {
         offer_id: u32,
         market_id: u32,
@@ -57,7 +67,6 @@ enum ContractEvent {
         market_id: u32,
         account_id: AccountId,
     },
-
     WithdrawalMade {
         market_id: u32,
         account_id: AccountId,
@@ -65,15 +74,15 @@ enum ContractEvent {
     },
 }
 
-#[derive(BorshSerialize, BorshDeserialize, Debug)]
+#[derive(BorshSerialize, BorshDeserialize)]
 struct Market {
     id: u32,
     description: String,
     owner: AccountId,
     is_open: bool,
     is_long: bool,
-    long_token: TokenMetadata,
-    short_token: TokenMetadata,
+    long_token: TokenArgs,
+    short_token: TokenArgs,
 }
 
 #[derive(Serialize)]
@@ -151,8 +160,11 @@ impl Contract {
         let id = self.next_market_id;
         let owner = env::predecessor_account_id();
 
-        let long_token = deploy_token();
-        let short_token = deploy_token();
+        let long_token = TokenArgs {};
+        let short_token = TokenArgs {};
+
+        deploy_token(&long_token);
+        deploy_token(&short_token);
 
         let market = Market {
             id,
