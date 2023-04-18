@@ -8,6 +8,7 @@ Questions
 - can one account deploy many contracts? (e.g.: one designated account for deploying all the different FTs)
 - how to see the FT balance of a predecessor_account?
 - what is the difference between Vector<T> and UnorderedMap<u32,T>?
+- how does await work? i want to deploy token contract, then execute further code after that
 */
 
 use near_contract_standards::non_fungible_token::metadata::TokenMetadata;
@@ -23,6 +24,9 @@ use near_sdk::{
 use near_sdk_contract_tools::{event, standard::nep297::Event};
 
 fn deploy_token() -> TokenMetadata {
+    /*
+    - take the included bytes of token contract and deploy the FT using the given metadata
+    */
     todo!()
 }
 
@@ -54,9 +58,11 @@ enum ContractEvent {
         account_id: AccountId,
     },
 
-    TransactionMade {},
-
-    WithdrawalMade {},
+    WithdrawalMade {
+        market_id: u32,
+        account_id: AccountId,
+        amount: U128,
+    },
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
@@ -192,7 +198,14 @@ impl Contract {
         .emit();
     }
 
-    pub fn delete_market(&mut self, market_id: u32) {}
+    pub fn delete_market(&mut self, market_id: u32) {
+        /*
+        - check ledger of long_token and short_token
+        - if all users have withdrawn, delete the market from self.markets
+        - return storage deposits to owner of market
+        */
+        todo!()
+    }
 
     // ----- Offers -----
 
@@ -298,7 +311,32 @@ impl Contract {
 
     // ----- Tokens -----
 
-    pub fn transact_token(&self, market_id: u32, is_long: bool) {}
+    pub fn withdraw(&self, market_id: u32) {
+        let predecessor = env::predecessor_account_id();
 
-    pub fn withdraw(&self, market_id: u32, amount: u128) {}
+        let market = self
+            .markets
+            .get(&market_id)
+            .unwrap_or_else(|| env::panic_str("Market does not exist."));
+
+        require!(!market.is_open, "Cannot withdraw from an open market.");
+
+        let token = if market.is_long {
+            &market.long_token
+        } else {
+            &market.short_token
+        };
+
+        // let amount = token.ft_balance(predecessor)
+        // swap amount of tokens for amount of NEAR
+
+        // ContractEvent::WithdrawalMade {
+        //     market_id: market.id,
+        //     account_id: predecessor.clone(),
+        //     amount: amount.into(),
+        // }
+        // .emit();
+
+        todo!()
+    }
 }
