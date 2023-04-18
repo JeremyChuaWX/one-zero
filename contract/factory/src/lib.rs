@@ -22,6 +22,10 @@ use near_sdk::{
 };
 use near_sdk_contract_tools::{event, standard::nep297::Event};
 
+fn deploy_token() -> TokenMetadata {
+    todo!()
+}
+
 #[event(standard = "x-one-zero", version = "0.1.0", serde = "near_sdk::serde")]
 enum ContractEvent {
     MarketCreated {
@@ -30,7 +34,6 @@ enum ContractEvent {
     },
     MarketClosed {
         market_id: u32,
-        owner: AccountId,
         is_long: bool,
     },
     MarketDeleted {
@@ -99,6 +102,12 @@ pub struct Offer {
     amount: U128,
 }
 
+#[derive(BorshSerialize, BorshStorageKey)]
+enum StorageKey {
+    Market,
+    Offer,
+}
+
 #[derive(BorshSerialize, BorshDeserialize, PanicOnDefault)]
 #[near_bindgen]
 pub struct Contract {
@@ -106,12 +115,6 @@ pub struct Contract {
     next_offer_id: u32,
     markets: UnorderedMap<u32, Market>,
     offers: UnorderedMap<u32, Offer>,
-}
-
-#[derive(BorshSerialize, BorshDeserialize, BorshStorageKey)]
-enum StorageKey {
-    Market,
-    Offer,
 }
 
 #[near_bindgen]
@@ -184,7 +187,6 @@ impl Contract {
 
         ContractEvent::MarketClosed {
             market_id: market.id,
-            owner: market.owner,
             is_long,
         }
         .emit();
@@ -272,7 +274,7 @@ impl Contract {
             "You cannot accept your own offer."
         );
 
-        let market = self
+        let _market = self
             .markets
             .get_mut(&offer.market_id)
             .unwrap_or_else(|| env::panic_str("Market no longer exists!"));
