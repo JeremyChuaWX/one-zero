@@ -1,5 +1,5 @@
 [package]
-name = "one-zero-long-token-contract"
+name = "one-zero-token-contract"
 version = "0.1.0"
 edition = "2021"
 
