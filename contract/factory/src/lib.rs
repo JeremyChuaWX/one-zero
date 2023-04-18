@@ -35,15 +35,31 @@ pub struct TokenArgs {
     metadata: FungibleTokenMetadata,
 }
 
-fn deploy_token(args: &TokenArgs) {
+fn deploy_tokens(long_args: &TokenArgs, short_args: &TokenArgs) {
     Promise::new(env::current_account_id())
         .deploy_contract(TOKEN_CONTRACT.to_vec())
-        .function_call("new".to_string(), serde_json::to_vec(args).unwrap(), 0, GAS);
+        .function_call(
+            "new".to_string(),
+            serde_json::to_vec(long_args).unwrap(),
+            0,
+            GAS,
+        )
+        .deploy_contract(TOKEN_CONTRACT.to_vec())
+        .function_call(
+            "new".to_string(),
+            serde_json::to_vec(short_args).unwrap(),
+            0,
+            GAS,
+        );
 }
 
 #[event(standard = "x-one-zero", version = "0.1.0", serde = "near_sdk::serde")]
 enum ContractEvent {
     MarketCreated {
+        market_id: u32,
+        owner: AccountId,
+    },
+    MarketActivated {
         market_id: u32,
         owner: AccountId,
     },
@@ -155,6 +171,9 @@ impl Contract {
     }
 
     pub fn create_market(&mut self, description: String) {
+        // TODO: fix callback for promise (activate market), ps can pass args in callback
+        // https://docs.near.org/develop/contracts/security/callbacks#async-callbacks
+
         self.next_market_id += 1;
 
         let id = self.next_market_id;
@@ -163,14 +182,13 @@ impl Contract {
         let long_token = TokenArgs {};
         let short_token = TokenArgs {};
 
-        deploy_token(&long_token);
-        deploy_token(&short_token);
+        deploy_tokens(&long_token, &short_token);
 
         let market = Market {
             id,
             description,
             owner: owner.clone(),
-            is_open: true,
+            is_open: false,
             is_long: false,
             long_token,
             short_token,
