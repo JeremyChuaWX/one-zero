@@ -1,17 +1,18 @@
 use near_contract_standards::{
     fungible_token::{
+        events::FtMint,
         metadata::{FungibleTokenMetadata, FungibleTokenMetadataProvider},
         FungibleToken,
     },
     impl_fungible_token_core, impl_fungible_token_storage,
 };
-use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
-use near_sdk::collections::LazyOption;
-use near_sdk::json_types::U128;
+use near_sdk::{
+    borsh::{self, BorshDeserialize, BorshSerialize},
+    env,
+};
+use near_sdk::{collections::LazyOption, Balance};
+use near_sdk::{env::log_str, json_types::U128};
 use near_sdk::{near_bindgen, AccountId, BorshStorageKey, PanicOnDefault, PromiseOrValue};
-
-impl_fungible_token_core!(Contract, token);
-impl_fungible_token_storage!(Contract, token);
 
 #[derive(BorshSerialize, BorshStorageKey)]
 enum StorageKey {
@@ -30,16 +31,39 @@ pub struct Contract {
 impl Contract {
     #[init]
     pub fn new(owner: AccountId, total_supply: U128, metadata: FungibleTokenMetadata) -> Self {
+        assert!(!env::state_exists(), "Already initialised");
+
         metadata.assert_valid();
+
         let mut this = Self {
             token: FungibleToken::new(StorageKey::Token),
             metadata: LazyOption::new(StorageKey::Metadata, Some(&metadata)),
         };
+
         this.token.internal_register_account(&owner);
         this.token.internal_deposit(&owner, total_supply.into());
+
+        FtMint {
+            owner_id: &owner,
+            amount: &total_supply,
+            memo: Some("Initial token supply is minted"),
+        }
+        .emit();
+
         this
     }
+
+    fn on_account_closed(&mut self, account_id: AccountId, balance: Balance) {
+        log_str(&format!("Closed @{} with {}", account_id, balance));
+    }
+
+    fn on_tokens_burned(&mut self, account_id: AccountId, amount: Balance) {
+        log_str(&format!("Account @{} burned {}", account_id, amount));
+    }
 }
+
+impl_fungible_token_core!(Contract, token, on_tokens_burned);
+impl_fungible_token_storage!(Contract, token, on_account_closed);
 
 #[near_bindgen]
 impl FungibleTokenMetadataProvider for Contract {
