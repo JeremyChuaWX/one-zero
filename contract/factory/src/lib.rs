@@ -30,9 +30,27 @@ const GAS: Gas = Gas(50_000_000_000_000);
 #[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
 #[serde(crate = "near_sdk::serde")]
 pub struct TokenArgs {
-    owner_id: AccountId,
+    owner: AccountId,
     total_supply: U128,
     metadata: FungibleTokenMetadata,
+}
+
+impl TokenArgs {
+    fn new(owner: AccountId, name: String, symbol: String) -> Self {
+        Self {
+            owner,
+            total_supply: 100.into(),
+            metadata: FungibleTokenMetadata {
+                spec: "ft-1.0.0".to_string(),
+                name,
+                symbol,
+                icon: None,
+                reference: None,
+                reference_hash: None,
+                decimals: 8,
+            },
+        }
+    }
 }
 
 fn deploy_tokens(long_args: &TokenArgs, short_args: &TokenArgs) {
@@ -65,6 +83,7 @@ enum ContractEvent {
     },
     MarketClosed {
         market_id: u32,
+        owner: AccountId,
         is_long: bool,
     },
     MarketDeleted {
@@ -176,16 +195,25 @@ impl Contract {
 
         self.next_market_id += 1;
 
-        let id = self.next_market_id;
+        let market_id = self.next_market_id;
         let owner = env::predecessor_account_id();
 
-        let long_token = TokenArgs {};
-        let short_token = TokenArgs {};
+        let long_token = TokenArgs::new(
+            owner.clone(),
+            "market () long token".to_string(),
+            "M()L".to_string(),
+        );
+
+        let short_token = TokenArgs::new(
+            owner.clone(),
+            "market () short token".to_string(),
+            "M()S".to_string(),
+        );
 
         deploy_tokens(&long_token, &short_token);
 
         let market = Market {
-            id,
+            id: market_id,
             description,
             owner: owner.clone(),
             is_open: false,
@@ -194,13 +222,9 @@ impl Contract {
             short_token,
         };
 
-        self.markets.insert(id, market);
+        self.markets.insert(market_id, market);
 
-        ContractEvent::MarketCreated {
-            market_id: id,
-            owner,
-        }
-        .emit();
+        ContractEvent::MarketCreated { market_id, owner }.emit();
     }
 
     pub fn close_market(&mut self, market_id: u32, is_long: bool) {
@@ -223,6 +247,7 @@ impl Contract {
 
         ContractEvent::MarketClosed {
             market_id: market.id,
+            owner: market.owner,
             is_long,
         }
         .emit();
