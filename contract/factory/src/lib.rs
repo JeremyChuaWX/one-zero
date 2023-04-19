@@ -19,7 +19,7 @@ use near_sdk::{
     near_bindgen, require,
     serde::{Deserialize, Serialize},
     serde_json,
-    store::UnorderedMap,
+    store::{UnorderedMap, Vector},
     AccountId, BorshStorageKey, Gas, PanicOnDefault, Promise, PromiseError,
 };
 use near_sdk_contract_tools::{event, standard::nep297::Event};
@@ -153,9 +153,8 @@ enum StorageKey {
 #[derive(BorshSerialize, BorshDeserialize, PanicOnDefault)]
 #[near_bindgen]
 pub struct Contract {
-    next_market_id: u32,
     next_offer_id: u32,
-    markets: UnorderedMap<u32, Market>,
+    markets: Vector<Market>,
     offers: UnorderedMap<u32, Offer>,
 }
 
@@ -164,9 +163,8 @@ impl Contract {
     #[init]
     pub fn new() -> Self {
         Self {
-            next_market_id: 1,
             next_offer_id: 1,
-            markets: UnorderedMap::new(StorageKey::Market),
+            markets: Vector::new(StorageKey::Market),
             offers: UnorderedMap::new(StorageKey::Offer),
         }
     }
@@ -174,15 +172,15 @@ impl Contract {
     // ----- Markets -----
 
     pub fn get_market(&self, market_id: u32) -> Option<ViewMarket> {
-        self.markets.get(&market_id).map(|m| m.into())
+        self.markets.get(market_id).map(|m| m.into())
     }
 
     pub fn list_markets(&self) -> Vec<ViewMarket> {
-        self.markets.iter().map(|(_, m)| m.into()).collect()
+        self.markets.iter().map(|m| m.into()).collect()
     }
 
     pub fn create_market(&mut self, description: String) {
-        let market_id = self.next_market_id;
+        let market_id = self.markets.len();
         let owner = env::predecessor_account_id();
 
         let long_token = TokenArgs::new(
@@ -242,8 +240,7 @@ impl Contract {
                 short_token,
             };
 
-            self.markets.insert(market_id, market);
-            self.next_market_id += 1;
+            self.markets.push(market);
 
             ContractEvent::MarketCreated { market_id, owner }.emit();
         }
@@ -252,7 +249,7 @@ impl Contract {
     pub fn close_market(&mut self, market_id: u32, is_long: bool) {
         let market = self
             .markets
-            .get_mut(&market_id)
+            .get_mut(market_id)
             .unwrap_or_else(|| env::panic_str("Market does not exist!"));
 
         require!(market.is_open, "Market is already closed.");
