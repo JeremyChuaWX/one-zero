@@ -82,10 +82,6 @@ enum ContractEvent {
         owner: AccountId,
         is_long: bool,
     },
-    MarketDeleted {
-        market_id: u32,
-        owner: AccountId,
-    },
     OfferCreated {
         offer_id: u32,
         market_id: u32,
@@ -277,15 +273,6 @@ impl Contract {
             is_long,
         }
         .emit();
-    }
-
-    pub fn delete_market(&mut self, market_id: u32) {
-        /*
-        - check ledger of long_token and short_token
-        - if all users have withdrawn, delete the market from self.markets
-        - return storage deposits to owner of market
-        */
-        todo!()
     }
 
     // ----- Offers -----
