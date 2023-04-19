@@ -350,26 +350,12 @@ impl Contract {
 
         let amount: U128 = amount.into();
 
-        let offer = self.offers.remove(&offer_id).unwrap_or_else(|| {
-            env::panic_str("Offer does not exist. Maybe someone already accepted it?")
-        });
-
         require!(
             offer.amount == amount,
             "You must attach exactly the same amount as the offer you are accepting."
         );
 
-        let predecessor = env::predecessor_account_id();
-
-        require!(
-            predecessor == offer.account_id,
-            "You cannot accept your own offer."
-        );
-
-        let _market = self
-            .markets
-            .get_mut(&offer.market_id)
-            .unwrap_or_else(|| env::panic_str("Market no longer exists!"));
+        let offer = self.offers.remove(&offer_id).unwrap();
 
         ContractEvent::OfferAccepted {
             offer_id,
@@ -395,7 +381,7 @@ impl Contract {
 
         let market = self
             .markets
-            .get(&market_id)
+            .get(market_id)
             .unwrap_or_else(|| env::panic_str("Market does not exist."));
 
         require!(!market.is_open, "Cannot withdraw from an open market.");
