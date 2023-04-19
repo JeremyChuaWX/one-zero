@@ -200,14 +200,14 @@ impl Contract {
 
         let long_token = TokenArgs::new(
             owner.clone(),
-            "market () long token".to_string(),
-            "M()L".to_string(),
+            format!("market {} long token", market_id),
+            format!("M{}L", market_id),
         );
 
         let short_token = TokenArgs::new(
             owner.clone(),
-            "market () short token".to_string(),
-            "M()S".to_string(),
+            format!("market {} short token", market_id),
+            format!("M{}S", market_id),
         );
 
         deploy_tokens(&long_token, &short_token);
