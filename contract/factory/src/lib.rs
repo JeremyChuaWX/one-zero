@@ -20,7 +20,7 @@ use near_sdk::{
     serde::{Deserialize, Serialize},
     serde_json,
     store::UnorderedMap,
-    AccountId, BorshStorageKey, Gas, PanicOnDefault, Promise,
+    AccountId, BorshStorageKey, Gas, PanicOnDefault, Promise, PromiseError,
 };
 use near_sdk_contract_tools::{event, standard::nep297::Event};
 
@@ -74,10 +74,6 @@ fn deploy_tokens(long_args: &TokenArgs, short_args: &TokenArgs) {
 #[event(standard = "x-one-zero", version = "0.1.0", serde = "near_sdk::serde")]
 enum ContractEvent {
     MarketCreated {
-        market_id: u32,
-        owner: AccountId,
-    },
-    MarketActivated {
         market_id: u32,
         owner: AccountId,
     },
@@ -172,8 +168,8 @@ impl Contract {
     #[init]
     pub fn new() -> Self {
         Self {
-            next_market_id: 0,
-            next_offer_id: 0,
+            next_market_id: 1,
+            next_offer_id: 1,
             markets: UnorderedMap::new(StorageKey::Market),
             offers: UnorderedMap::new(StorageKey::Offer),
         }
@@ -190,11 +186,6 @@ impl Contract {
     }
 
     pub fn create_market(&mut self, description: String) {
-        // TODO: fix callback for promise (activate market), ps can pass args in callback
-        // https://docs.near.org/develop/contracts/security/callbacks#async-callbacks
-
-        self.next_market_id += 1;
-
         let market_id = self.next_market_id;
         let owner = env::predecessor_account_id();
 
@@ -210,21 +201,56 @@ impl Contract {
             format!("M{}S", market_id),
         );
 
-        deploy_tokens(&long_token, &short_token);
+        Promise::new(env::current_account_id())
+            .deploy_contract(TOKEN_CONTRACT.to_vec())
+            .function_call(
+                "new".to_string(),
+                serde_json::to_vec(&long_token).unwrap(),
+                0,
+                GAS,
+            )
+            .deploy_contract(TOKEN_CONTRACT.to_vec())
+            .function_call(
+                "new".to_string(),
+                serde_json::to_vec(&short_token).unwrap(),
+                0,
+                GAS,
+            )
+            .then(Self::ext(env::current_account_id()).activate_market(
+                market_id,
+                owner,
+                description,
+                long_token,
+                short_token,
+            ));
+    }
 
-        let market = Market {
-            id: market_id,
-            description,
-            owner: owner.clone(),
-            is_open: false,
-            is_long: false,
-            long_token,
-            short_token,
-        };
+    #[private]
+    pub fn activate_market(
+        &mut self,
+        #[callback_result] call_result: Result<(), PromiseError>,
+        market_id: u32,
+        owner: AccountId,
+        description: String,
+        long_token: TokenArgs,
+        short_token: TokenArgs,
+    ) {
+        if call_result.is_ok() {
+            let market = Market {
+                id: market_id,
+                description,
+                owner: owner.clone(),
+                is_open: false,
+                is_long: false,
+                long_token,
+                short_token,
+            };
 
-        self.markets.insert(market_id, market);
+            self.markets.insert(market_id, market);
+            self.next_market_id += 1;
 
-        ContractEvent::MarketCreated { market_id, owner }.emit();
+            ContractEvent::MarketCreated { market_id, owner }.emit();
+        }
     }
 
     pub fn close_market(&mut self, market_id: u32, is_long: bool) {
@@ -290,23 +316,22 @@ impl Contract {
             "You must attach a non-zero amount to make an offer."
         );
 
-        self.next_offer_id += 1;
-
-        let id = self.next_offer_id;
+        let offer_id = self.next_offer_id;
         let account_id = env::predecessor_account_id();
 
         let offer = Offer {
-            id,
+            id: offer_id,
             market_id,
             account_id: account_id.clone(),
             is_long,
             amount: amount.into(),
         };
 
-        self.offers.insert(id, offer);
+        self.offers.insert(offer_id, offer);
+        self.next_offer_id += 1;
 
         ContractEvent::OfferCreated {
-            offer_id: id,
+            offer_id,
             market_id,
             account_id,
             is_long,
