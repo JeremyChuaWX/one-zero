@@ -3,7 +3,7 @@ Questions
 - still deciding if market maker is user/house
 - how to calculate the value of the FTs?
 - how to decide the total supply for the FTs?
-- how to refer to a subcontract?
+- how to cross call FT? what is the account id to use?
 - what is the difference between account and contract?
 - can one account deploy many contracts? (e.g.: one designated account for deploying all the different FTs)
 - how to see the FT balance of a predecessor_account?
@@ -354,6 +354,7 @@ impl Contract {
 
         // transfer_long(offer.market_id, long, offer.amount)
         // transfer_short(offer.market_id, short, offer.amount)
+        todo!()
     }
 
     // ----- Tokens -----
@@ -375,7 +376,7 @@ impl Contract {
         };
 
         // let amount = token.ft_balance(predecessor)
-        // swap amount of tokens for amount of NEAR
+        // swap amount of tokens for 2 times the amount of NEAR
 
         // ContractEvent::WithdrawalMade {
         //     market_id: market.id,
@@ -383,7 +384,6 @@ impl Contract {
         //     amount: amount.into(),
         // }
         // .emit();
-
         todo!()
     }
 }
