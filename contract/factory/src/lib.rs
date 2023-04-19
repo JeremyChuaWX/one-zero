@@ -326,6 +326,21 @@ impl Contract {
 
     #[payable]
     pub fn accept_offer(&mut self, offer_id: u32) {
+        let offer = self.offers.get(&offer_id).unwrap_or_else(|| {
+            env::panic_str("Offer does not exist. Maybe someone already accepted it?")
+        });
+
+        self.markets
+            .get_mut(offer.market_id)
+            .unwrap_or_else(|| env::panic_str("Market no longer exists!"));
+
+        let predecessor = env::predecessor_account_id();
+
+        require!(
+            predecessor == offer.account_id,
+            "You cannot accept your own offer."
+        );
+
         let amount = env::attached_deposit();
 
         require!(
