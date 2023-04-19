@@ -11,7 +11,7 @@ Questions
 - how does await work? i want to deploy token contract, then execute further code after that
 */
 
-use near_contract_standards::fungible_token::metadata::FungibleTokenMetadata;
+use near_contract_standards::fungible_token::metadata::{FungibleTokenMetadata, FT_METADATA_SPEC};
 use near_sdk::{
     borsh::{self, BorshDeserialize, BorshSerialize},
     env,
@@ -41,7 +41,7 @@ impl TokenArgs {
             owner,
             total_supply: 100.into(),
             metadata: FungibleTokenMetadata {
-                spec: "ft-1.0.0".to_string(),
+                spec: FT_METADATA_SPEC.to_string(),
                 name,
                 symbol,
                 icon: None,
@@ -51,24 +51,6 @@ impl TokenArgs {
             },
         }
     }
-}
-
-fn deploy_tokens(long_args: &TokenArgs, short_args: &TokenArgs) {
-    Promise::new(env::current_account_id())
-        .deploy_contract(TOKEN_CONTRACT.to_vec())
-        .function_call(
-            "new".to_string(),
-            serde_json::to_vec(long_args).unwrap(),
-            0,
-            GAS,
-        )
-        .deploy_contract(TOKEN_CONTRACT.to_vec())
-        .function_call(
-            "new".to_string(),
-            serde_json::to_vec(short_args).unwrap(),
-            0,
-            GAS,
-        );
 }
 
 #[event(standard = "x-one-zero", version = "0.1.0", serde = "near_sdk::serde")]
