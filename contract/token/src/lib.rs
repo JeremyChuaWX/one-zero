@@ -1,6 +1,5 @@
 use near_contract_standards::{
     fungible_token::{
-        events::FtMint,
         metadata::{FungibleTokenMetadata, FungibleTokenMetadataProvider},
         FungibleToken,
     },
@@ -13,8 +12,6 @@ use near_sdk::{
     json_types::U128,
     log, near_bindgen, AccountId, Balance, BorshStorageKey, PanicOnDefault, PromiseOrValue,
 };
-
-const ZERO_SUPPLY: u128 = 0;
 
 #[derive(BorshSerialize, BorshStorageKey)]
 enum StorageKey {
@@ -43,15 +40,6 @@ impl Contract {
         };
 
         this.token.internal_register_account(&owner);
-        this.token.internal_deposit(&owner, ZERO_SUPPLY.into());
-
-        FtMint {
-            owner_id: &owner,
-            amount: &ZERO_SUPPLY.into(),
-            memo: Some("Initial token supply is minted"),
-        }
-        .emit();
-
         this
     }
 
