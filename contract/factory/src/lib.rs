@@ -21,27 +21,13 @@ use near_sdk::{
     store::{UnorderedMap, Vector},
     AccountId, BorshStorageKey, Gas, PanicOnDefault, Promise, PromiseError,
 };
-use near_sdk_contract_tools::{event, standard::nep297::Event};
-
-#[ext_contract(ext_token)]
-pub trait ExtToken {
-    fn ft_transfer(receiver_id: String, amount: String, memo: Option<String>) -> ();
-
-    fn ft_transfer_call(
-        receiver_id: String,
-        amount: String,
-        memo: Option<String>,
-        msg: String,
-    ) -> Promise;
-
-    fn ft_on_transfer(sender_id: String, amount: String, msg: String) -> String;
-
-    fn ft_total_supply() -> String;
-
-    fn ft_balance_of(account_id: String) -> String;
-
-    fn ft_resolve_transfer(sender_id: String, receiver_id: String, amount: String) -> String;
-}
+use near_sdk_contract_tools::{
+    event,
+    standard::{
+        nep141::{ext_nep141, Nep141},
+        nep297::Event,
+    },
+};
 
 const TOKEN_CONTRACT: &[u8] = include_bytes!(
     "../../token/target/wasm32-unknown-unknown/release/one_zero_token_contract.wasm"
