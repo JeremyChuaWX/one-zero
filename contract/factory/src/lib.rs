@@ -178,6 +178,34 @@ impl Factory {
             )
     }
 
+    pub fn withdraw(&self, market_id: u32) {
+        let predecessor = env::predecessor_account_id();
+
+        let market = self
+            .markets
+            .get(market_id)
+            .unwrap_or_else(|| env::panic_str("Market does not exist"));
+
+        require!(!market.is_open, "Cannot withdraw from an open market");
+
+        let token = if market.is_long {
+            &market.long_token
+        } else {
+            &market.short_token
+        };
+
+        // let amount = token.ft_balance(predecessor)
+        // swap amount of tokens for 2 times the amount of NEAR
+
+        // ContractEvent::WithdrawalMade {
+        //     market_id: market.id,
+        //     account_id: predecessor.clone(),
+        //     amount: amount.into(),
+        // }
+        // .emit();
+        todo!()
+    }
+
     // ----- Markets -----
 
     pub fn get_market(&self, market_id: u32) -> Option<ViewMarket> {
@@ -254,13 +282,13 @@ impl Factory {
             .get_mut(market_id)
             .unwrap_or_else(|| env::panic_str("Market does not exist!"));
 
-        require!(market.is_open, "Market is already closed.");
+        require!(market.is_open, "Market is already closed");
 
         let predecessor = env::predecessor_account_id();
 
         require!(
             market.owner == predecessor,
-            "You are not allowed to close a market you did not create."
+            "You are not allowed to close a market you did not create"
         );
 
         market.is_open = false;
@@ -299,7 +327,7 @@ impl Factory {
 
         require!(
             amount > 0,
-            "You must attach a non-zero amount to make an offer."
+            "You must attach a non-zero amount to make an offer"
         );
 
         let offer_id = self.next_offer_id;
@@ -328,9 +356,10 @@ impl Factory {
 
     #[payable]
     pub fn accept_offer(&mut self, offer_id: u32) {
-        let offer = self.offers.get(&offer_id).unwrap_or_else(|| {
-            env::panic_str("Offer does not exist. Maybe someone already accepted it?")
-        });
+        let offer = self
+            .offers
+            .get(&offer_id)
+            .unwrap_or_else(|| env::panic_str("Offer does not exist"));
 
         self.markets
             .get_mut(offer.market_id)
@@ -340,21 +369,21 @@ impl Factory {
 
         require!(
             predecessor == offer.account_id,
-            "You cannot accept your own offer."
+            "You cannot accept your own offer"
         );
 
         let amount = env::attached_deposit();
 
         require!(
             amount > 0,
-            "You must attach a non-zero amount to make an offer."
+            "You must attach a non-zero amount to make an offer"
         );
 
         let amount: U128 = amount.into();
 
         require!(
             offer.amount == amount,
-            "You must attach exactly the same amount as the offer you are accepting."
+            "You must attach exactly the same amount as the offer you are accepting"
         );
 
         let offer = self.offers.remove(&offer_id).unwrap();
@@ -374,36 +403,6 @@ impl Factory {
 
         // long_contract.internal_deposit(offer.market_id, long, offer.amount)
         // short_contract.internal_deposit(offer.market_id, short, offer.amount)
-        todo!()
-    }
-
-    // ----- Tokens -----
-
-    pub fn withdraw(&self, market_id: u32) {
-        let predecessor = env::predecessor_account_id();
-
-        let market = self
-            .markets
-            .get(market_id)
-            .unwrap_or_else(|| env::panic_str("Market does not exist."));
-
-        require!(!market.is_open, "Cannot withdraw from an open market.");
-
-        let token = if market.is_long {
-            &market.long_token
-        } else {
-            &market.short_token
-        };
-
-        // let amount = token.ft_balance(predecessor)
-        // swap amount of tokens for 2 times the amount of NEAR
-
-        // ContractEvent::WithdrawalMade {
-        //     market_id: market.id,
-        //     account_id: predecessor.clone(),
-        //     amount: amount.into(),
-        // }
-        // .emit();
         todo!()
     }
 }
