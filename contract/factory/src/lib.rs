@@ -13,7 +13,7 @@ Questions
 use near_contract_standards::fungible_token::metadata::{FungibleTokenMetadata, FT_METADATA_SPEC};
 use near_sdk::{
     borsh::{self, BorshDeserialize, BorshSerialize},
-    env,
+    env, ext_contract,
     json_types::U128,
     near_bindgen, require,
     serde::{Deserialize, Serialize},
@@ -22,6 +22,26 @@ use near_sdk::{
     AccountId, BorshStorageKey, Gas, PanicOnDefault, Promise, PromiseError,
 };
 use near_sdk_contract_tools::{event, standard::nep297::Event};
+
+#[ext_contract(ext_token)]
+pub trait ExtToken {
+    fn ft_transfer(receiver_id: String, amount: String, memo: Option<String>) -> ();
+
+    fn ft_transfer_call(
+        receiver_id: String,
+        amount: String,
+        memo: Option<String>,
+        msg: String,
+    ) -> Promise;
+
+    fn ft_on_transfer(sender_id: String, amount: String, msg: String) -> String;
+
+    fn ft_total_supply() -> String;
+
+    fn ft_balance_of(account_id: String) -> String;
+
+    fn ft_resolve_transfer( sender_id: String, receiver_id: String, amount: String) -> String;
+}
 
 const TOKEN_CONTRACT: &[u8] = include_bytes!(
     "../../token/target/wasm32-unknown-unknown/release/one_zero_token_contract.wasm"
