@@ -7,9 +7,7 @@ Questions
     - the issue is how to differentiate different FTs deployed on the same account?
     - or is this the reason for subaccounts?
 - can one account deploy many contracts? (e.g.: one designated account for deploying all the different FTs)
-- how to reference the token contract from the factory contract safely?
-    - docs mention token::ext(<account_here>), but how do you get the `token` struct into factory?
-    - from factory example in "near-example", they use the low level include_bytes -> function_call version, is it okay?
+- is there a macro for FT ext_contract? like a FT trait?
 */
 
 use near_contract_standards::fungible_token::metadata::{FungibleTokenMetadata, FT_METADATA_SPEC};
