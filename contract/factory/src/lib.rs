@@ -1,11 +1,3 @@
-/*
-Questions
-- still deciding if market maker is user/house
-- how to calculate the value of the FTs?
-- how to decide the total supply for the FTs?
-- can one account deploy many contracts? NO, subaccounts please
-*/
-
 use near_contract_standards::fungible_token::metadata::{FungibleTokenMetadata, FT_METADATA_SPEC};
 use near_sdk::{
     borsh::{self, BorshDeserialize, BorshSerialize},
