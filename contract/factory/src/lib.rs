@@ -49,7 +49,7 @@ impl TokenArgs {
 }
 
 #[event(standard = "x-one-zero", version = "0.1.0", serde = "near_sdk::serde")]
-enum ContractEvent {
+enum FactoryEvent {
     MarketCreated {
         market_id: u32,
         owner: AccountId,
@@ -125,24 +125,27 @@ pub struct Offer {
 enum StorageKey {
     Market,
     Offer,
+    Storage,
 }
 
 #[derive(BorshSerialize, BorshDeserialize, PanicOnDefault)]
 #[near_bindgen]
-pub struct Contract {
+pub struct Factory {
     next_offer_id: u32,
     markets: Vector<Market>,
     offers: UnorderedMap<u32, Offer>,
+    storage_deposits: LookupMap<AccountId, Balance>,
 }
 
 #[near_bindgen]
-impl Contract {
+impl Factory {
     #[init]
     pub fn new() -> Self {
         Self {
             next_offer_id: 1,
             markets: Vector::new(StorageKey::Market),
             offers: UnorderedMap::new(StorageKey::Offer),
+            storage_deposits: LookupMap::new(StorageKey::Storage),
         }
     }
 
@@ -221,7 +224,7 @@ impl Contract {
 
             self.markets.push(market);
 
-            ContractEvent::MarketCreated { market_id, owner }.emit();
+            FactoryEvent::MarketCreated { market_id, owner }.emit();
         }
     }
 
@@ -243,7 +246,7 @@ impl Contract {
         market.is_open = false;
         market.is_long = is_long;
 
-        ContractEvent::MarketClosed {
+        FactoryEvent::MarketClosed {
             market_id: market.id,
             owner: market.owner.clone(),
             is_long,
@@ -293,7 +296,7 @@ impl Contract {
         self.offers.insert(offer_id, offer);
         self.next_offer_id += 1;
 
-        ContractEvent::OfferCreated {
+        FactoryEvent::OfferCreated {
             offer_id,
             market_id,
             account_id,
@@ -336,7 +339,7 @@ impl Contract {
 
         let offer = self.offers.remove(&offer_id).unwrap();
 
-        ContractEvent::OfferAccepted {
+        FactoryEvent::OfferAccepted {
             offer_id,
             market_id: offer.market_id,
             account_id: predecessor.clone(),
