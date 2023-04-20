@@ -251,7 +251,7 @@ impl Contract {
 
         ContractEvent::MarketClosed {
             market_id: market.id,
-            owner: market.owner,
+            owner: market.owner.clone(),
             is_long,
         }
         .emit();
