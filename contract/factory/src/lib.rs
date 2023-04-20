@@ -184,7 +184,7 @@ impl Contract {
         self.markets.iter().map(|m| m.into()).collect()
     }
 
-    pub fn create_market(&mut self, description: String) {
+    pub fn create_market(&mut self, description: String) -> Promise {
         let market_id = self.markets.len();
         let owner = env::predecessor_account_id();
 
@@ -221,7 +221,7 @@ impl Contract {
                 description,
                 long_token,
                 short_token,
-            ));
+            ))
     }
 
     #[private]
