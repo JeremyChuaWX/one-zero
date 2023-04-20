@@ -4,11 +4,12 @@ Questions
 - how to calculate the value of the FTs?
 - how to decide the total supply for the FTs?
 - how to cross call FT? what is the account id to use?
-- what is the difference between account and contract?
+    - the issue is how to differentiate different FTs deployed on the same account?
+    - or is this the reason for subaccounts?
 - can one account deploy many contracts? (e.g.: one designated account for deploying all the different FTs)
-- how to see the FT balance of a predecessor_account?
-- what is the difference between Vector<T> and UnorderedMap<u32,T>?
-- how does await work? i want to deploy token contract, then execute further code after that
+- how to reference the token contract from the factory contract safely?
+    - docs mention token::ext(<account_here>), but how do you get the `token` struct into factory?
+    - from factory example in "near-example", they use the low level include_bytes -> function_call version, is it okay?
 */
 
 use near_contract_standards::fungible_token::metadata::{FungibleTokenMetadata, FT_METADATA_SPEC};
