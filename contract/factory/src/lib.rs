@@ -24,7 +24,10 @@ use near_sdk::{
 };
 use near_sdk_contract_tools::{event, standard::nep297::Event};
 
-const TOKEN_CONTRACT: &[u8] = include_bytes!("path/to/token/contract/here");
+const TOKEN_CONTRACT: &[u8] = include_bytes!(
+    "../../token/target/wasm32-unknown-unknown/release/one_zero_token_contract.wasm"
+);
+
 const GAS: Gas = Gas(50_000_000_000_000);
 
 #[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
