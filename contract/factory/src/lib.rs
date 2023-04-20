@@ -29,6 +29,7 @@ const TOKEN_CONTRACT: &[u8] = include_bytes!(
     "../../token/target/wasm32-unknown-unknown/release/one_zero_token_contract.wasm"
 );
 
+const NO_DEPOSIT: u128 = 0;
 const GAS: Gas = Gas(50_000_000_000_000);
 
 #[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
@@ -186,14 +187,14 @@ impl Contract {
             .function_call(
                 "new".to_string(),
                 serde_json::to_vec(&long_token).unwrap(),
-                0,
+                NO_DEPOSIT,
                 GAS,
             )
             .deploy_contract(TOKEN_CONTRACT.to_vec())
             .function_call(
                 "new".to_string(),
                 serde_json::to_vec(&short_token).unwrap(),
-                0,
+                NO_DEPOSIT,
                 GAS,
             )
             .then(Self::ext(env::current_account_id()).activate_market(
