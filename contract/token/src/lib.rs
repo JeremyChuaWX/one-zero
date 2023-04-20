@@ -8,11 +8,11 @@ use near_contract_standards::{
 };
 use near_sdk::{
     borsh::{self, BorshDeserialize, BorshSerialize},
+    collections::LazyOption,
     env,
+    json_types::U128,
+    log, near_bindgen, AccountId, Balance, BorshStorageKey, PanicOnDefault, PromiseOrValue,
 };
-use near_sdk::{collections::LazyOption, Balance};
-use near_sdk::{env::log_str, json_types::U128};
-use near_sdk::{near_bindgen, AccountId, BorshStorageKey, PanicOnDefault, PromiseOrValue};
 
 const ZERO_SUPPLY: u128 = 0;
 
@@ -56,11 +56,11 @@ impl Contract {
     }
 
     fn on_account_closed(&mut self, account_id: AccountId, balance: Balance) {
-        log_str(&format!("Closed @{} with {}", account_id, balance));
+        log!(&format!("Closed @{} with {}", account_id, balance));
     }
 
     fn on_tokens_burned(&mut self, account_id: AccountId, amount: Balance) {
-        log_str(&format!("Account @{} burned {}", account_id, amount));
+        log!(&format!("Account @{} burned {}", account_id, amount));
     }
 }
 
