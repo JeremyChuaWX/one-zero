@@ -3,11 +3,7 @@ Questions
 - still deciding if market maker is user/house
 - how to calculate the value of the FTs?
 - how to decide the total supply for the FTs?
-- how to cross call FT? what is the account id to use?
-    - the issue is how to differentiate different FTs deployed on the same account?
-    - or is this the reason for subaccounts?
-- can one account deploy many contracts? (e.g.: one designated account for deploying all the different FTs)
-- is there a macro for FT ext_contract? like a FT trait?
+- can one account deploy many contracts? NO, subaccounts please
 */
 
 use near_contract_standards::fungible_token::metadata::{FungibleTokenMetadata, FT_METADATA_SPEC};
