@@ -9,7 +9,7 @@ Questions
 use near_contract_standards::fungible_token::metadata::{FungibleTokenMetadata, FT_METADATA_SPEC};
 use near_sdk::{
     borsh::{self, BorshDeserialize, BorshSerialize},
-    env, ext_contract,
+    env,
     json_types::U128,
     near_bindgen, require,
     serde::{Deserialize, Serialize},
