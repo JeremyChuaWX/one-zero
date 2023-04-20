@@ -40,7 +40,7 @@ pub trait ExtToken {
 
     fn ft_balance_of(account_id: String) -> String;
 
-    fn ft_resolve_transfer( sender_id: String, receiver_id: String, amount: String) -> String;
+    fn ft_resolve_transfer(sender_id: String, receiver_id: String, amount: String) -> String;
 }
 
 const TOKEN_CONTRACT: &[u8] = include_bytes!(
