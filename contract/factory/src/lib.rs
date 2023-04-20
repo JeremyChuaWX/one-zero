@@ -6,8 +6,8 @@ use near_sdk::{
     near_bindgen, require,
     serde::{Deserialize, Serialize},
     serde_json,
-    store::{UnorderedMap, Vector},
-    AccountId, BorshStorageKey, Gas, PanicOnDefault, Promise, PromiseError,
+    store::{LookupMap, UnorderedMap, Vector},
+    AccountId, Balance, BorshStorageKey, Gas, PanicOnDefault, Promise, PromiseError,
 };
 use near_sdk_contract_tools::{
     event,
@@ -85,8 +85,8 @@ struct Market {
     owner: AccountId,
     is_open: bool,
     is_long: bool,
-    long_token: TokenArgs,
-    short_token: TokenArgs,
+    long_token: AccountId,
+    short_token: AccountId,
 }
 
 #[derive(Serialize)]
@@ -149,6 +149,35 @@ impl Factory {
         }
     }
 
+    // ----- Utils -----
+
+    fn format_token_account_id(symbol: &str) -> AccountId {
+        let token_account_id = format!(
+            "{}.{}",
+            symbol.to_ascii_lowercase(),
+            env::current_account_id()
+        );
+        assert!(
+            env::is_valid_account_id(token_account_id.as_bytes()),
+            "Invalid token account id"
+        );
+        token_account_id
+            .parse()
+            .unwrap_or_else(|_| env::panic_str("Invalid token account id"))
+    }
+
+    fn deploy_token(account: AccountId, args: &TokenArgs) -> Promise {
+        Promise::new(account)
+            .create_account()
+            .deploy_contract(TOKEN_CONTRACT.to_vec())
+            .function_call(
+                "new".to_string(),
+                serde_json::to_vec(args).unwrap(),
+                NO_DEPOSIT,
+                GAS,
+            )
+    }
+
     // ----- Markets -----
 
     pub fn get_market(&self, market_id: u32) -> Option<ViewMarket> {
@@ -163,55 +192,46 @@ impl Factory {
         let market_id = self.markets.len();
         let owner = env::predecessor_account_id();
 
-        let long_token = TokenArgs::new(
+        let long_token_args = TokenArgs::new(
             owner.clone(),
             format!("market {} long token", market_id),
             format!("M{}L", market_id),
         );
+        let long_token_account = Self::format_token_account_id(&long_token_args.metadata.symbol);
+        let long_token_promise = Self::deploy_token(long_token_account.clone(), &long_token_args);
 
-        let short_token = TokenArgs::new(
+        let short_token_args = TokenArgs::new(
             owner.clone(),
             format!("market {} short token", market_id),
             format!("M{}S", market_id),
         );
+        let short_token_account = Self::format_token_account_id(&short_token_args.metadata.symbol);
+        let short_token_promise =
+            Self::deploy_token(short_token_account.clone(), &short_token_args);
 
-        // TODO: use subaccounts!
-
-        Promise::new(env::current_account_id())
-            .deploy_contract(TOKEN_CONTRACT.to_vec())
-            .function_call(
-                "new".to_string(),
-                serde_json::to_vec(&long_token).unwrap(),
-                NO_DEPOSIT,
-                GAS,
-            )
-            .deploy_contract(TOKEN_CONTRACT.to_vec())
-            .function_call(
-                "new".to_string(),
-                serde_json::to_vec(&short_token).unwrap(),
-                NO_DEPOSIT,
-                GAS,
-            )
-            .then(Self::ext(env::current_account_id()).activate_market(
+        long_token_promise.and(short_token_promise).then(
+            Self::ext(env::current_account_id()).activate_market(
                 market_id,
                 owner,
                 description,
-                long_token,
-                short_token,
-            ))
+                long_token_account,
+                short_token_account,
+            ),
+        )
     }
 
     #[private]
     pub fn activate_market(
         &mut self,
-        #[callback_result] call_result: Result<(), PromiseError>,
+        #[callback_result] long_result: Result<(), PromiseError>,
+        #[callback_result] short_result: Result<(), PromiseError>,
         market_id: u32,
         owner: AccountId,
         description: String,
-        long_token: TokenArgs,
-        short_token: TokenArgs,
+        long_token: AccountId,
+        short_token: AccountId,
     ) {
-        if call_result.is_ok() {
+        if long_result.is_ok() && short_result.is_ok() {
             let market = Market {
                 id: market_id,
                 description,
