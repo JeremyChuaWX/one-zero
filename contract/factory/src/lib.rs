@@ -28,7 +28,6 @@ const GAS: Gas = Gas(50_000_000_000_000);
 #[serde(crate = "near_sdk::serde")]
 pub struct TokenArgs {
     owner: AccountId,
-    total_supply: U128,
     metadata: FungibleTokenMetadata,
 }
 
@@ -36,7 +35,6 @@ impl TokenArgs {
     fn new(owner: AccountId, name: String, symbol: String) -> Self {
         Self {
             owner,
-            total_supply: 100.into(),
             metadata: FungibleTokenMetadata {
                 spec: FT_METADATA_SPEC.to_string(),
                 name,
@@ -173,6 +171,8 @@ impl Contract {
             format!("market {} short token", market_id),
             format!("M{}S", market_id),
         );
+
+        // TODO: use subaccounts!
 
         Promise::new(env::current_account_id())
             .deploy_contract(TOKEN_CONTRACT.to_vec())
@@ -343,14 +343,14 @@ impl Contract {
         }
         .emit();
 
-        let (long, short) = if offer.is_long {
+        let (long_account, short_account) = if offer.is_long {
             (offer.account_id, predecessor)
         } else {
             (predecessor, offer.account_id)
         };
 
-        // transfer_long(offer.market_id, long, offer.amount)
-        // transfer_short(offer.market_id, short, offer.amount)
+        // long_contract.internal_deposit(offer.market_id, long, offer.amount)
+        // short_contract.internal_deposit(offer.market_id, short, offer.amount)
         todo!()
     }
 

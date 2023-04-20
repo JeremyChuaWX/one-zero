@@ -14,6 +14,8 @@ use near_sdk::{collections::LazyOption, Balance};
 use near_sdk::{env::log_str, json_types::U128};
 use near_sdk::{near_bindgen, AccountId, BorshStorageKey, PanicOnDefault, PromiseOrValue};
 
+const ZERO_SUPPLY: u128 = 0;
+
 #[derive(BorshSerialize, BorshStorageKey)]
 enum StorageKey {
     Token,
@@ -30,7 +32,7 @@ pub struct Contract {
 #[near_bindgen]
 impl Contract {
     #[init]
-    pub fn new(owner: AccountId, total_supply: U128, metadata: FungibleTokenMetadata) -> Self {
+    pub fn new(owner: AccountId, metadata: FungibleTokenMetadata) -> Self {
         assert!(!env::state_exists(), "Already initialised");
 
         metadata.assert_valid();
@@ -41,11 +43,11 @@ impl Contract {
         };
 
         this.token.internal_register_account(&owner);
-        this.token.internal_deposit(&owner, total_supply.into());
+        this.token.internal_deposit(&owner, ZERO_SUPPLY.into());
 
         FtMint {
             owner_id: &owner,
-            amount: &total_supply,
+            amount: &ZERO_SUPPLY.into(),
             memo: Some("Initial token supply is minted"),
         }
         .emit();
