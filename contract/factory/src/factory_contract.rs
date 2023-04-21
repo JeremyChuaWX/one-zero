@@ -103,7 +103,7 @@ pub struct Factory {
     next_offer_id: u32,
     markets: Vector<Market>,
     offers: UnorderedMap<u32, Offer>,
-    storage_deposits: LookupMap<AccountId, Balance>,
+    pub storage_deposits: LookupMap<AccountId, Balance>,
 }
 
 #[near_bindgen]
@@ -117,8 +117,6 @@ impl Factory {
             storage_deposits: LookupMap::new(StorageKey::Storage),
         }
     }
-
-    // ----- Storage -----
 
     // ----- Market -----
 
