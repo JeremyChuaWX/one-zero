@@ -20,7 +20,6 @@ use near_sdk_contract_tools::{
 const TOKEN_CONTRACT: &[u8] = include_bytes!(
     "../../token/target/wasm32-unknown-unknown/release/one_zero_token_contract.wasm"
 );
-
 const NO_DEPOSIT: u128 = 0;
 const GAS: Gas = Gas(50_000_000_000_000);
 
@@ -163,7 +162,7 @@ impl Factory {
         );
         token_account_id
             .parse()
-            .unwrap_or_else(|_| env::panic_str("Invalid token account id"))
+            .unwrap_or_else(|_| env::panic_str("Cannot parse token account id"))
     }
 
     fn deploy_token(account: AccountId, args: &TokenArgs) -> Promise {
