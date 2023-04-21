@@ -216,6 +216,8 @@ impl Factory {
 
             self.markets.push(market);
 
+            // TODO: make users pay for storage
+
             FactoryEvent::MarketCreated { market_id, owner }.emit();
         }
     }

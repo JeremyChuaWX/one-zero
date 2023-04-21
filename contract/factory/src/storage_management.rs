@@ -98,6 +98,7 @@ impl StorageManagement for Factory {
     }
 
     fn storage_balance_bounds(&self) -> StorageBalanceBounds {
+        // TODO: define required_storage_balance properly
         let required_storage_balance = env::storage_byte_cost();
         StorageBalanceBounds {
             min: required_storage_balance.into(),
