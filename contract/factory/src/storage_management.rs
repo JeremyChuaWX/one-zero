@@ -10,13 +10,13 @@ const ZERO: u128 = 0;
 #[near_bindgen]
 impl Factory {
     fn internal_register_account(&mut self, account_id: AccountId) {
-        self.storage_deposits.insert(account_id, 0);
+        self.storage_balances.insert(account_id, 0);
     }
 
     fn internal_storage_balance_of(&self, account_id: &AccountId) -> Option<StorageBalance> {
         // TODO: set values of StorageBalance properly
 
-        if self.storage_deposits.contains_key(account_id) {
+        if self.storage_balances.contains_key(account_id) {
             Some(StorageBalance {
                 total: ZERO.into(),
                 available: ZERO.into(),
@@ -39,7 +39,7 @@ impl StorageManagement for Factory {
 
         let amount = env::attached_deposit();
         let account_id = account_id.unwrap_or_else(env::predecessor_account_id);
-        if self.storage_deposits.contains_key(&account_id) {
+        if self.storage_balances.contains_key(&account_id) {
             log!("The account is already registered, refunding the deposit");
             if amount > 0 {
                 Promise::new(env::predecessor_account_id()).transfer(amount);
@@ -81,9 +81,9 @@ impl StorageManagement for Factory {
         assert_one_yocto();
         let account_id = env::predecessor_account_id();
         let force = force.unwrap_or(false);
-        if let Some(balance) = self.storage_deposits.get(&account_id) {
+        if let Some(balance) = self.storage_balances.get(&account_id) {
             if *balance == 0 || force {
-                self.storage_deposits.remove(&account_id);
+                self.storage_balances.remove(&account_id);
                 Promise::new(account_id.clone()).transfer(self.storage_balance_bounds().min.0 + 1);
                 true
             } else {
