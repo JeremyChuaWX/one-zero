@@ -6,7 +6,7 @@ use near_sdk::{
     near_bindgen, require,
     serde::{Deserialize, Serialize},
     store::{LookupMap, UnorderedMap, Vector},
-    AccountId, Balance, BorshStorageKey, PanicOnDefault, Promise, PromiseError,
+    AccountId, BorshStorageKey, PanicOnDefault, Promise, PromiseError,
 };
 use near_sdk_contract_tools::{
     event,
