@@ -1,11 +1,40 @@
-use crate::factory_contract::TokenArgs;
-use near_sdk::{env, serde_json, AccountId, Gas, Promise};
+use near_contract_standards::fungible_token::metadata::{FungibleTokenMetadata, FT_METADATA_SPEC};
+use near_sdk::{
+    borsh::{self, BorshDeserialize, BorshSerialize},
+    env,
+    serde::{Deserialize, Serialize},
+    serde_json, AccountId, Gas, Promise,
+};
 
 const TOKEN_CONTRACT: &[u8] = include_bytes!(
     "../../token/target/wasm32-unknown-unknown/release/one_zero_token_contract.wasm"
 );
 const NO_DEPOSIT: u128 = 0;
 const GAS: Gas = Gas(50_000_000_000_000);
+
+#[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
+#[serde(crate = "near_sdk::serde")]
+pub struct TokenArgs {
+    pub owner: AccountId,
+    pub metadata: FungibleTokenMetadata,
+}
+
+impl TokenArgs {
+    pub fn new(owner: AccountId, name: String, symbol: String) -> Self {
+        Self {
+            owner,
+            metadata: FungibleTokenMetadata {
+                spec: FT_METADATA_SPEC.to_string(),
+                name,
+                symbol,
+                icon: None,
+                reference: None,
+                reference_hash: None,
+                decimals: 8,
+            },
+        }
+    }
+}
 
 pub fn format_token_account_id(symbol: &str) -> AccountId {
     let token_account_id = format!(

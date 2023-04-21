@@ -1,5 +1,3 @@
-use crate::utils;
-use near_contract_standards::fungible_token::metadata::{FungibleTokenMetadata, FT_METADATA_SPEC};
 use near_sdk::{
     borsh::{self, BorshDeserialize, BorshSerialize},
     env,
@@ -17,29 +15,7 @@ use near_sdk_contract_tools::{
     },
 };
 
-#[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
-#[serde(crate = "near_sdk::serde")]
-pub struct TokenArgs {
-    owner: AccountId,
-    metadata: FungibleTokenMetadata,
-}
-
-impl TokenArgs {
-    pub fn new(owner: AccountId, name: String, symbol: String) -> Self {
-        Self {
-            owner,
-            metadata: FungibleTokenMetadata {
-                spec: FT_METADATA_SPEC.to_string(),
-                name,
-                symbol,
-                icon: None,
-                reference: None,
-                reference_hash: None,
-                decimals: 8,
-            },
-        }
-    }
-}
+use crate::utils::*;
 
 #[event(standard = "x-one-zero", version = "0.1.0", serde = "near_sdk::serde")]
 pub enum FactoryEvent {
@@ -192,16 +168,16 @@ impl Factory {
             format!("market {} long token", market_id),
             format!("M{}L", market_id),
         );
-        let long_account = utils::format_token_account_id(&long_args.metadata.symbol);
-        let long_promise = utils::deploy_token(long_account.clone(), &long_args);
+        let long_account = format_token_account_id(&long_args.metadata.symbol);
+        let long_promise = deploy_token(long_account.clone(), &long_args);
 
         let short_args = TokenArgs::new(
             owner.clone(),
             format!("market {} short token", market_id),
             format!("M{}S", market_id),
         );
-        let short_account = utils::format_token_account_id(&short_args.metadata.symbol);
-        let short_promise = utils::deploy_token(short_account.clone(), &short_args);
+        let short_account = format_token_account_id(&short_args.metadata.symbol);
+        let short_promise = deploy_token(short_account.clone(), &short_args);
 
         let attached = env::attached_deposit();
 
