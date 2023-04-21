@@ -10,20 +10,22 @@ const ZERO: u128 = 0;
 #[near_bindgen]
 impl Factory {
     fn internal_register_account(&mut self, account_id: AccountId) {
-        self.storage_balances.insert(account_id, 0);
+        self.storage_balances.insert(
+            account_id,
+            StorageBalance {
+                total: ZERO.into(),
+                available: ZERO.into(),
+            },
+        );
     }
 
     fn internal_storage_balance_of(&self, account_id: &AccountId) -> Option<StorageBalance> {
-        // TODO: set values of StorageBalance properly
-
-        if self.storage_balances.contains_key(account_id) {
-            Some(StorageBalance {
-                total: ZERO.into(),
-                available: ZERO.into(),
+        self.storage_balances
+            .get(account_id)
+            .map(|sb| StorageBalance {
+                total: sb.total,
+                available: sb.available,
             })
-        } else {
-            None
-        }
     }
 }
 

@@ -1,3 +1,4 @@
+use near_contract_standards::storage_management::StorageBalance;
 use near_sdk::{
     borsh::{self, BorshDeserialize, BorshSerialize},
     env,
@@ -103,7 +104,7 @@ pub struct Factory {
     next_offer_id: u32,
     markets: Vector<Market>,
     offers: UnorderedMap<u32, Offer>,
-    pub storage_balances: LookupMap<AccountId, Balance>,
+    pub storage_balances: LookupMap<AccountId, StorageBalance>,
 }
 
 #[near_bindgen]
