@@ -84,7 +84,7 @@ impl StorageManagement for Factory {
         let account_id = env::predecessor_account_id();
         let force = force.unwrap_or(false);
         if let Some(balance) = self.storage_balances.get(&account_id) {
-            if *balance == 0 || force {
+            if balance.total.0 == 0 || force {
                 self.storage_balances.remove(&account_id);
                 Promise::new(account_id.clone()).transfer(self.storage_balance_bounds().min.0 + 1);
                 true
