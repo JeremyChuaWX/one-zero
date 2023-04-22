@@ -30,7 +30,7 @@ impl TokenArgs {
                 icon: None,
                 reference: None,
                 reference_hash: None,
-                decimals: 8,
+                decimals: 0,
             },
         }
     }
