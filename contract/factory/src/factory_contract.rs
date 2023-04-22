@@ -313,7 +313,7 @@ impl Factory {
             .unwrap_or_else(|| env::panic_str("Offer does not exist"));
 
         self.markets
-            .get_mut(offer.market_id)
+            .get(offer.market_id)
             .unwrap_or_else(|| env::panic_str("Market no longer exists!"));
 
         let predecessor = env::predecessor_account_id();
