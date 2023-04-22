@@ -3,7 +3,7 @@ use near_sdk::{
     borsh::{self, BorshDeserialize, BorshSerialize},
     env, require,
     serde::{Deserialize, Serialize},
-    serde_json, AccountId, Gas, Promise,
+    serde_json, AccountId, Balance, Gas, Promise,
 };
 
 const TOKEN_CONTRACT: &[u8] = include_bytes!(
@@ -53,14 +53,17 @@ pub fn format_token_account_id(symbol: &str) -> AccountId {
     token_account_id
 }
 
+pub fn calculate_deploy_cost() -> Balance {
+    (TOKEN_CONTRACT.to_vec().len() as u128) * env::STORAGE_PRICE_PER_BYTE
+}
+
 pub fn deploy_token(account_id: AccountId, args: &TokenArgs) -> Promise {
+    let args = serde_json::to_vec(args).unwrap();
+    let deploy_cost = calculate_deploy_cost();
+
     Promise::new(account_id)
         .create_account()
+        .transfer(deploy_cost)
         .deploy_contract(TOKEN_CONTRACT.to_vec())
-        .function_call(
-            "new".to_string(),
-            serde_json::to_vec(args).unwrap(),
-            NO_DEPOSIT,
-            GAS,
-        )
+        .function_call("new".to_string(), args, NO_DEPOSIT, GAS)
 }

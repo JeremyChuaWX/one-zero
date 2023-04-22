@@ -179,8 +179,12 @@ impl Factory {
         let short_promise = deploy_token(short_account.clone(), &short_args);
 
         let attached = env::attached_deposit();
+        let total_deploy_cost = calculate_deploy_cost() * 2;
 
-        // TODO: require minimum amount of attached deposit to deploy both contracts
+        require!(
+            attached >= total_deploy_cost,
+            "You must attach enough NEAR to create market"
+        );
 
         long_promise
             .and(short_promise)
