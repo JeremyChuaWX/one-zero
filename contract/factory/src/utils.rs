@@ -1,7 +1,7 @@
 use near_contract_standards::fungible_token::metadata::{FungibleTokenMetadata, FT_METADATA_SPEC};
 use near_sdk::{
     borsh::{self, BorshDeserialize, BorshSerialize},
-    env,
+    env, require,
     serde::{Deserialize, Serialize},
     serde_json, AccountId, Gas, Promise,
 };
@@ -37,18 +37,20 @@ impl TokenArgs {
 }
 
 pub fn format_token_account_id(symbol: &str) -> AccountId {
-    let token_account_id = format!(
+    let token_account_id: AccountId = format!(
         "{}.{}",
         symbol.to_ascii_lowercase(),
-        env::current_account_id()
-    );
-    assert!(
+        env::current_account_id().to_string(),
+    )
+    .parse()
+    .unwrap_or_else(|_| env::panic_str("Cannot parse token account id"));
+
+    require!(
         env::is_valid_account_id(token_account_id.as_bytes()),
         "Invalid token account id"
     );
+
     token_account_id
-        .parse()
-        .unwrap_or_else(|_| env::panic_str("Cannot parse token account id"))
 }
 
 pub fn deploy_token(account_id: AccountId, args: &TokenArgs) -> Promise {
