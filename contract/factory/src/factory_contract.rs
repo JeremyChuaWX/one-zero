@@ -136,8 +136,8 @@ pub struct Factory {
     markets: Vector<Market>,
     offers: UnorderedMap<u32, Offer>,
     pub storage_balances: LookupMap<AccountId, StorageBalance>,
-    storage_balance_market_cost: Balance,
-    storage_balance_offer_cost: Balance,
+    market_storage_cost: Balance,
+    offer_storage_cost: Balance,
 }
 
 #[near_bindgen]
@@ -149,8 +149,8 @@ impl Factory {
             markets: Vector::new(StorageKey::Market),
             offers: UnorderedMap::new(StorageKey::Offer),
             storage_balances: LookupMap::new(StorageKey::Storage),
-            storage_balance_market_cost: 0,
-            storage_balance_offer_cost: 0,
+            market_storage_cost: 0,
+            offer_storage_cost: 0,
         };
 
         let dummy_account = env::predecessor_account_id();
@@ -158,12 +158,12 @@ impl Factory {
         let market = Market::dummy(dummy_account.clone());
         let storage_balance_market_cost =
             factory.calculate_storage_cost(CalculateStorageCostParam::Market(market));
-        factory.storage_balance_market_cost = storage_balance_market_cost;
+        factory.market_storage_cost = storage_balance_market_cost;
 
         let offer = Offer::dummy(dummy_account.clone());
         let storage_balance_offer_cost =
             factory.calculate_storage_cost(CalculateStorageCostParam::Offer(offer));
-        factory.storage_balance_offer_cost = storage_balance_offer_cost;
+        factory.offer_storage_cost = storage_balance_offer_cost;
 
         factory
     }
