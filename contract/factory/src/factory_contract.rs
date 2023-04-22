@@ -170,16 +170,22 @@ impl Factory {
 
     fn calculate_storage_cost(&mut self, param: CalculateStorageCostParam) -> Balance {
         let storage_usage_before = env::storage_usage();
-        match param {
+        let storage_usage_after = match param {
             CalculateStorageCostParam::Market(market) => {
                 self.markets.push(market);
+                let storage_usage = env::storage_usage();
+                self.markets.clear();
+                storage_usage
             }
             CalculateStorageCostParam::Offer(offer) => {
                 self.offers.insert(offer.id, offer);
+                let storage_usage = env::storage_usage();
+                self.offers.clear();
+                storage_usage
             }
-        }
-        let storage_usage_after = env::storage_usage();
-        Balance::from(storage_usage_before - storage_usage_after)
+        };
+
+        Balance::from(storage_usage_after - storage_usage_before)
     }
 
     // ----- Market -----
