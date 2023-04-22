@@ -207,7 +207,8 @@ impl Factory {
         description: String,
         long_token: AccountId,
         short_token: AccountId,
-    ) {
+    ) -> bool {
+        // if is_promise_success() {
         if long_result.is_ok() && short_result.is_ok() {
             let market = Market {
                 id: market_id,
@@ -221,9 +222,10 @@ impl Factory {
 
             self.markets.push(market);
 
-            // TODO: make users pay for storage
-
             FactoryEvent::MarketCreated { market_id, owner }.emit();
+            return true;
+        } else {
+            return false;
         }
     }
 
