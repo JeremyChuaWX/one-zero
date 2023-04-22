@@ -6,7 +6,7 @@ use near_sdk::{
     near_bindgen, require,
     serde::{Deserialize, Serialize},
     store::{LookupMap, UnorderedMap, Vector},
-    AccountId, BorshStorageKey, PanicOnDefault, Promise, PromiseError,
+    AccountId, Balance, BorshStorageKey, PanicOnDefault, Promise, PromiseError,
 };
 use near_sdk_contract_tools::{
     event,
@@ -16,7 +16,7 @@ use near_sdk_contract_tools::{
     },
 };
 
-use crate::utils::*;
+use crate::utils;
 
 #[event(standard = "x-one-zero", version = "0.1.0", serde = "near_sdk::serde")]
 pub enum FactoryEvent {
@@ -59,6 +59,20 @@ pub struct Market {
     short_token: AccountId,
 }
 
+impl Market {
+    fn dummy(dummy_account: AccountId) -> Self {
+        Self {
+            id: 0,
+            description: "testing".to_string(),
+            owner: dummy_account.clone(),
+            is_open: false,
+            is_long: false,
+            long_token: dummy_account.clone(),
+            short_token: dummy_account.clone(),
+        }
+    }
+}
+
 #[derive(Serialize)]
 #[serde(crate = "near_sdk::serde")]
 pub struct ViewMarket<'a> {
@@ -91,11 +105,28 @@ pub struct Offer {
     amount: U128,
 }
 
+impl Offer {
+    fn dummy(dummy_account: AccountId) -> Self {
+        Self {
+            id: 0,
+            market_id: 0,
+            account_id: dummy_account,
+            is_long: false,
+            amount: 123.into(),
+        }
+    }
+}
+
 #[derive(BorshSerialize, BorshStorageKey)]
 pub enum StorageKey {
     Market,
     Offer,
     Storage,
+}
+
+enum CalculateStorageCostParam {
+    Market(Market),
+    Offer(Offer),
 }
 
 #[derive(BorshSerialize, BorshDeserialize, PanicOnDefault)]
@@ -105,18 +136,50 @@ pub struct Factory {
     markets: Vector<Market>,
     offers: UnorderedMap<u32, Offer>,
     pub storage_balances: LookupMap<AccountId, StorageBalance>,
+    storage_balance_market_cost: Balance,
+    storage_balance_offer_cost: Balance,
 }
 
 #[near_bindgen]
 impl Factory {
     #[init]
     pub fn new() -> Self {
-        Self {
+        let mut factory = Self {
             next_offer_id: 1,
             markets: Vector::new(StorageKey::Market),
             offers: UnorderedMap::new(StorageKey::Offer),
             storage_balances: LookupMap::new(StorageKey::Storage),
+            storage_balance_market_cost: 0,
+            storage_balance_offer_cost: 0,
+        };
+
+        let dummy_account = env::predecessor_account_id();
+
+        let market = Market::dummy(dummy_account.clone());
+        let storage_balance_market_cost =
+            factory.calculate_storage_cost(CalculateStorageCostParam::Market(market));
+        factory.storage_balance_market_cost = storage_balance_market_cost;
+
+        let offer = Offer::dummy(dummy_account.clone());
+        let storage_balance_offer_cost =
+            factory.calculate_storage_cost(CalculateStorageCostParam::Offer(offer));
+        factory.storage_balance_offer_cost = storage_balance_offer_cost;
+
+        factory
+    }
+
+    fn calculate_storage_cost(&mut self, param: CalculateStorageCostParam) -> Balance {
+        let storage_usage_before = env::storage_usage();
+        match param {
+            CalculateStorageCostParam::Market(market) => {
+                self.markets.push(market);
+            }
+            CalculateStorageCostParam::Offer(offer) => {
+                self.offers.insert(offer.id, offer);
+            }
         }
+        let storage_usage_after = env::storage_usage();
+        Balance::from(storage_usage_before - storage_usage_after)
     }
 
     // ----- Market -----
@@ -162,24 +225,24 @@ impl Factory {
         let market_id = self.markets.len();
         let owner = env::predecessor_account_id();
 
-        let long_args = TokenArgs::new(
+        let long_args = utils::TokenArgs::new(
             owner.clone(),
             format!("market {} long token", market_id),
             format!("M{}L", market_id),
         );
-        let long_account = format_token_account_id(&long_args.metadata.symbol);
-        let long_promise = deploy_token(long_account.clone(), &long_args);
+        let long_account = utils::format_token_account_id(&long_args.metadata.symbol);
+        let long_promise = utils::deploy_token(long_account.clone(), &long_args);
 
-        let short_args = TokenArgs::new(
+        let short_args = utils::TokenArgs::new(
             owner.clone(),
             format!("market {} short token", market_id),
             format!("M{}S", market_id),
         );
-        let short_account = format_token_account_id(&short_args.metadata.symbol);
-        let short_promise = deploy_token(short_account.clone(), &short_args);
+        let short_account = utils::format_token_account_id(&short_args.metadata.symbol);
+        let short_promise = utils::deploy_token(short_account.clone(), &short_args);
 
         let attached = env::attached_deposit();
-        let total_deploy_cost = calculate_deploy_cost() * 2;
+        let total_deploy_cost = utils::calculate_deploy_cost() * 2;
 
         require!(
             attached >= total_deploy_cost,
