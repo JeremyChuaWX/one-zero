@@ -1,7 +1,7 @@
 use near_contract_standards::storage_management::StorageBalance;
 use near_sdk::{
     borsh::{self, BorshDeserialize, BorshSerialize},
-    env,
+    env, is_promise_success,
     json_types::U128,
     near_bindgen, require,
     serde::{Deserialize, Serialize},
@@ -68,7 +68,7 @@ impl Market {
             is_open: false,
             is_long: false,
             long_token: dummy_account.clone(),
-            short_token: dummy_account.clone(),
+            short_token: dummy_account,
         }
     }
 }
@@ -160,7 +160,7 @@ impl Factory {
             factory.calculate_storage_cost(CalculateStorageCostParam::Market(market));
         factory.market_storage_cost = storage_balance_market_cost;
 
-        let offer = Offer::dummy(dummy_account.clone());
+        let offer = Offer::dummy(dummy_account);
         let storage_balance_offer_cost =
             factory.calculate_storage_cost(CalculateStorageCostParam::Offer(offer));
         factory.offer_storage_cost = storage_balance_offer_cost;
@@ -269,16 +269,13 @@ impl Factory {
     #[private]
     pub fn activate_market(
         &mut self,
-        #[callback_result] long_result: Result<(), PromiseError>,
-        #[callback_result] short_result: Result<(), PromiseError>,
         market_id: u32,
         owner: AccountId,
         description: String,
         long_token: AccountId,
         short_token: AccountId,
     ) -> bool {
-        // if is_promise_success() {
-        if long_result.is_ok() && short_result.is_ok() {
+        if is_promise_success() {
             let market = Market {
                 id: market_id,
                 description,
@@ -292,9 +289,9 @@ impl Factory {
             self.markets.push(market);
 
             FactoryEvent::MarketCreated { market_id, owner }.emit();
-            return true;
+            true
         } else {
-            return false;
+            false
         }
     }
 

@@ -42,7 +42,7 @@ impl StorageManagement for Factory {
         let amount = env::attached_deposit();
         let account_id = account_id.unwrap_or_else(env::predecessor_account_id);
         let registered = self.storage_balances.contains_key(&account_id);
-        let registration_only = registration_only.unwrap_or_else(|| false);
+        let registration_only = registration_only.unwrap_or(false);
 
         if registered {
             let storage_balance = self.storage_balances.get_mut(&account_id).unwrap();

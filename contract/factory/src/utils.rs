@@ -40,7 +40,7 @@ pub fn format_token_account_id(symbol: &str) -> AccountId {
     let token_account_id: AccountId = format!(
         "{}.{}",
         symbol.to_ascii_lowercase(),
-        env::current_account_id().to_string(),
+        env::current_account_id(),
     )
     .parse()
     .unwrap_or_else(|_| env::panic_str("Cannot parse token account id"));
