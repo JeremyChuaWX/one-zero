@@ -6,9 +6,8 @@ use near_sdk::{
     serde_json, AccountId, Balance, Gas, Promise,
 };
 
-const TOKEN_CONTRACT: &[u8] = include_bytes!(
-    "../../token/target/wasm32-unknown-unknown/release/one_zero_token_contract.wasm"
-);
+const TOKEN_CONTRACT: &[u8] =
+    include_bytes!("../../target/wasm32-unknown-unknown/release/token.wasm");
 const NO_DEPOSIT: u128 = 0;
 const GAS: Gas = Gas(50_000_000_000_000);
 
