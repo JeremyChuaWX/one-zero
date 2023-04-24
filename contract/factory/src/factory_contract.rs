@@ -136,8 +136,8 @@ pub struct Factory {
     markets: Vector<Market>,
     offers: UnorderedMap<u32, Offer>,
     pub storage_balances: LookupMap<AccountId, StorageBalance>,
-    market_storage_cost: Balance,
-    offer_storage_cost: Balance,
+    pub market_storage_cost: Balance,
+    pub offer_storage_cost: Balance,
 }
 
 #[near_bindgen]
@@ -185,7 +185,7 @@ impl Factory {
             }
         };
 
-        Balance::from(storage_usage_after - storage_usage_before)
+        (storage_usage_after - storage_usage_before) as u128 * env::storage_byte_cost()
     }
 
     // ----- Market -----

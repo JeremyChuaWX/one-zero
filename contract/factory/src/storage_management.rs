@@ -21,6 +21,10 @@ impl Factory {
         );
     }
 
+    fn internal_account_is_registered(&self, account_id: &AccountId) -> bool {
+        self.storage_balances.contains_key(account_id)
+    }
+
     fn internal_storage_balance_of(&self, account_id: &AccountId) -> Option<StorageBalance> {
         self.storage_balances
             .get(account_id)
@@ -35,10 +39,6 @@ impl Factory {
         account_id: &AccountId,
     ) -> Option<&mut StorageBalance> {
         self.storage_balances.get_mut(account_id)
-    }
-
-    fn internal_account_is_registered(&self, account_id: &AccountId) -> bool {
-        self.storage_balances.contains_key(account_id)
     }
 }
 
@@ -167,10 +167,9 @@ impl StorageManagement for Factory {
     }
 
     fn storage_balance_bounds(&self) -> StorageBalanceBounds {
-        // TODO: define required_storage_balance properly
-        let required_storage_balance = env::storage_byte_cost();
+        let total_min_balance = self.offer_storage_cost + self.market_storage_cost;
         StorageBalanceBounds {
-            min: required_storage_balance.into(),
+            min: total_min_balance.into(),
             max: None,
         }
     }
