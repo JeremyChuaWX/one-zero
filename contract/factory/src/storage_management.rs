@@ -34,7 +34,7 @@ impl Factory {
         &mut self,
         account_id: &AccountId,
     ) -> Option<&mut StorageBalance> {
-        self.storage_balances.get_mut(&account_id)
+        self.storage_balances.get_mut(account_id)
     }
 
     fn internal_account_is_registered(&self, account_id: &AccountId) -> bool {
@@ -161,7 +161,7 @@ impl StorageManagement for Factory {
                 self.storage_balances.remove(&env::predecessor_account_id());
 
                 // Returns `true` if the account was successfully unregistered
-                return true;
+                true
             }
         }
     }
