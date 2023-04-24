@@ -1,10 +1,10 @@
-# Smart contract for one-zero
+# Smart contracts for one-zero
 
-## Contracts
+## Smart contracts
 
 - Factory
-- Long token
-- Short token
+- Token
+- Marketmaker
 
 ## How it works
 
@@ -12,4 +12,5 @@
 - Make an offer at the market
 - When offer is accepted (share pair is matched), long tokens and short tokens are distributed based on position
 - One can sell these tokens to others
-- When market closes, tokens related to that market get paid out/burned depending on the market resolution
+- When market closes, token owners can interact with the factory to resolve their tokens
+- Tokens related to that market get paid out/burned depending on the market resolution
