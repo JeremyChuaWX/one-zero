@@ -4,7 +4,7 @@
 
 - Factory
 - Token
-- Marketmaker
+- MarketMaker
 
 ## How it works
 
