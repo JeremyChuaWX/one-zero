@@ -29,6 +29,17 @@ impl Factory {
                 available: sb.available,
             })
     }
+
+    fn internal_mut_storage_balance_of(
+        &mut self,
+        account_id: &AccountId,
+    ) -> Option<&mut StorageBalance> {
+        self.storage_balances.get_mut(&account_id)
+    }
+
+    fn internal_account_is_registered(&self, account_id: &AccountId) -> bool {
+        self.storage_balances.contains_key(account_id)
+    }
 }
 
 #[near_bindgen]
@@ -43,11 +54,11 @@ impl StorageManagement for Factory {
 
         // If `account_id` is omitted, the deposit MUST go toward predecessor account
         let account_id = account_id.unwrap_or_else(env::predecessor_account_id);
-        let registered = self.storage_balances.contains_key(&account_id);
+        let registered = self.internal_account_is_registered(&account_id);
         let registration_only = registration_only.unwrap_or(false);
 
         if registered {
-            let storage_balance = self.storage_balances.get_mut(&account_id).unwrap();
+            let storage_balance = self.internal_mut_storage_balance_of(&account_id).unwrap();
 
             if registration_only {
                 // If `registration_only=true`, contract MUST refund full deposit if already registered
@@ -68,7 +79,7 @@ impl StorageManagement for Factory {
                 "The attached deposit is less than the minimum storage balance"
             );
 
-            let storage_balance = self.storage_balances.get_mut(&account_id).unwrap();
+            let storage_balance = self.internal_mut_storage_balance_of(&account_id).unwrap();
 
             if registration_only {
                 // If `registration_only=true`, contract MUST refund above the minimum balance if the account wasn't registered
@@ -89,13 +100,12 @@ impl StorageManagement for Factory {
 
     #[payable]
     fn storage_withdraw(&mut self, amount: Option<U128>) -> StorageBalance {
-        // MUST require exactly 1 yoctoNEAR attached balance to prevent restricted
+        // MUST require exactly 1 yoctoNEAR attached balance
         assert_one_yocto();
 
         // If predecessor account not registered, contract MUST panic
         let storage_balance = self
-            .storage_balances
-            .get_mut(&env::predecessor_account_id())
+            .internal_mut_storage_balance_of(&env::predecessor_account_id())
             .unwrap_or_else(|| env::panic_str("Your account is not registered"));
 
         match amount {
