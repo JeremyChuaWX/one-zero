@@ -85,8 +85,34 @@ impl StorageManagement for Factory {
 
     #[payable]
     fn storage_withdraw(&mut self, amount: Option<U128>) -> StorageBalance {
+        // MUST require exactly 1 yoctoNEAR attached balance to prevent restricted
         assert_one_yocto();
-        todo!()
+
+        // If predecessor account not registered, contract MUST panic
+        let storage_balance = self
+            .storage_balances
+            .get_mut(&env::predecessor_account_id())
+            .unwrap_or_else(|| env::panic_str("Your account is not registered"));
+
+        match amount {
+            Some(amount) => {
+                // If `amount` exceeds predecessor account's available balance, contract MUST panic
+                require!(
+                    amount <= storage_balance.available,
+                    "Insufficient available balance"
+                );
+
+                storage_balance.available = (storage_balance.available.0 - amount.0).into();
+            }
+            None => {
+                // If omitted, contract MUST refund full `available` balance
+                storage_balance.available = ZERO.into();
+            }
+        }
+
+        // Returns the StorageBalance structure showing updated balances
+        self.internal_storage_balance_of(&env::predecessor_account_id())
+            .unwrap()
     }
 
     #[payable]
