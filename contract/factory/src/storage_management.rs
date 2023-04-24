@@ -131,8 +131,39 @@ impl StorageManagement for Factory {
 
     #[payable]
     fn storage_unregister(&mut self, force: Option<bool>) -> bool {
+        // MUST require exactly 1 yoctoNEAR attached balance
         assert_one_yocto();
-        todo!()
+
+        // If the predecessor account is not registered, the function MUST return `false` without panic
+        if !self.internal_account_is_registered(&env::predecessor_account_id()) {
+            // Returns `false` if account was not registered before.
+            return false;
+        }
+
+        match force {
+            Some(true) => {
+                // Contract MAY panic if it doesn't support forced unregistration
+                env::panic_str("Does not support force unregistration");
+            }
+            _ => {
+                let storage_balance = self
+                    .internal_storage_balance_of(&env::predecessor_account_id())
+                    .unwrap();
+
+                // If `force=false` or `force` is omitted, the contract MUST panic if caller has existing account data
+                require!(
+                    storage_balance.available.0 == 0,
+                    "Cannot unregister account with existing data"
+                );
+
+                // Unregisters the predecessor account and returns the storage NEAR deposit
+                Promise::new(env::predecessor_account_id()).transfer(storage_balance.total.into());
+                self.storage_balances.remove(&env::predecessor_account_id());
+
+                // Returns `true` if the account was successfully unregistered
+                return true;
+            }
+        }
     }
 
     fn storage_balance_bounds(&self) -> StorageBalanceBounds {
