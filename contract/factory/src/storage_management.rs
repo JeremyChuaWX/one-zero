@@ -40,6 +40,8 @@ impl StorageManagement for Factory {
         registration_only: Option<bool>,
     ) -> StorageBalance {
         let amount = env::attached_deposit();
+
+        // If `account_id` is omitted, the deposit MUST go toward predecessor account
         let account_id = account_id.unwrap_or_else(env::predecessor_account_id);
         let registered = self.storage_balances.contains_key(&account_id);
         let registration_only = registration_only.unwrap_or(false);
@@ -48,6 +50,7 @@ impl StorageManagement for Factory {
             let storage_balance = self.storage_balances.get_mut(&account_id).unwrap();
 
             if registration_only {
+                // If `registration_only=true`, contract MUST refund full deposit if already registered
                 log!("The account is already registered, refunding the deposit");
                 if amount > 0 {
                     Promise::new(env::predecessor_account_id()).transfer(amount);
@@ -68,6 +71,7 @@ impl StorageManagement for Factory {
             let storage_balance = self.storage_balances.get_mut(&account_id).unwrap();
 
             if registration_only {
+                // If `registration_only=true`, contract MUST refund above the minimum balance if the account wasn't registered
                 storage_balance.total = min_balance.into();
                 let refund = amount - min_balance;
                 if refund > 0 {
