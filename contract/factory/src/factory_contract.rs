@@ -6,7 +6,7 @@ use near_sdk::{
     near_bindgen, require,
     serde::{Deserialize, Serialize},
     store::{LookupMap, UnorderedMap, Vector},
-    AccountId, Balance, BorshStorageKey, PanicOnDefault, Promise, PromiseError,
+    AccountId, Balance, BorshStorageKey, PanicOnDefault, Promise,
 };
 use near_sdk_contract_tools::{
     event,
@@ -231,6 +231,7 @@ impl Factory {
         let market_id = self.markets.len();
         let owner = env::predecessor_account_id();
 
+        // long token
         let long_args = utils::TokenArgs::new(
             owner.clone(),
             format!("market {} long token", market_id),
@@ -239,6 +240,7 @@ impl Factory {
         let long_account = utils::format_token_account_id(&long_args.metadata.symbol);
         let long_promise = utils::deploy_token(long_account.clone(), &long_args);
 
+        // short token
         let short_args = utils::TokenArgs::new(
             owner.clone(),
             format!("market {} short token", market_id),
@@ -248,7 +250,7 @@ impl Factory {
         let short_promise = utils::deploy_token(short_account.clone(), &short_args);
 
         let attached = env::attached_deposit();
-        let total_deploy_cost = utils::calculate_deploy_cost() * 2;
+        let total_deploy_cost = utils::calculate_deploy_cost() * 2; // TODO: need to add storage costs
 
         require!(
             attached >= total_deploy_cost,
@@ -263,6 +265,7 @@ impl Factory {
                 description,
                 long_account,
                 short_account,
+                // attached_deposit
             ))
     }
 
@@ -274,25 +277,28 @@ impl Factory {
         description: String,
         long_token: AccountId,
         short_token: AccountId,
+        // attached_deposit: u128,
     ) -> bool {
-        if is_promise_success() {
-            let market = Market {
-                id: market_id,
-                description,
-                owner: owner.clone(),
-                is_open: false,
-                is_long: false,
-                long_token,
-                short_token,
-            };
-
-            self.markets.push(market);
-
-            FactoryEvent::MarketCreated { market_id, owner }.emit();
-            true
-        } else {
-            false
+        if !is_promise_success() {
+            return false;
         }
+
+        // TODO: check remaining attached deposit?
+
+        let market = Market {
+            id: market_id,
+            description,
+            owner: owner.clone(),
+            is_open: false,
+            is_long: false,
+            long_token,
+            short_token,
+        };
+
+        self.markets.push(market);
+
+        FactoryEvent::MarketCreated { market_id, owner }.emit();
+        true
     }
 
     pub fn close_market(&mut self, market_id: u32, is_long: bool) {
