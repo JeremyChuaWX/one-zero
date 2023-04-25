@@ -173,8 +173,8 @@ impl Factory {
                 let storage_usage_after = env::storage_usage();
                 self.markets.clear();
 
-                self.market_storage_cost =
-                    (storage_usage_after - storage_usage_before) as u128 * env::storage_byte_cost()
+                let storage_usage: u128 = (storage_usage_after - storage_usage_before).into();
+                self.market_storage_cost = storage_usage * env::storage_byte_cost();
             }
 
             CalculateStorageCostParam::Offer(offer) => {
@@ -182,8 +182,8 @@ impl Factory {
                 let storage_usage_after = env::storage_usage();
                 self.offers.clear();
 
-                self.offer_storage_cost =
-                    (storage_usage_after - storage_usage_before) as u128 * env::storage_byte_cost()
+                let storage_usage: u128 = (storage_usage_after - storage_usage_before).into();
+                self.offer_storage_cost = storage_usage * env::storage_byte_cost();
             }
         };
     }
