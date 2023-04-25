@@ -2,13 +2,15 @@ use near_contract_standards::fungible_token::{
     receiver::FungibleTokenReceiver, resolver::FungibleTokenResolver,
 };
 use near_sdk::{
-    json_types::U128, near_bindgen, serde::Deserialize, serde_json, AccountId, PromiseOrValue,
+    json_types::U128, log, near_bindgen, serde::Deserialize, serde_json, AccountId, Promise,
+    PromiseOrValue,
 };
 
 use crate::factory_contract::{Factory, FactoryExt};
 
 #[near_bindgen]
 impl FungibleTokenResolver for Factory {
+    #[private]
     fn ft_resolve_transfer(
         &mut self,
         sender_id: AccountId,
@@ -48,10 +50,14 @@ impl FungibleTokenResolver for Factory {
 
 #[derive(Deserialize)]
 #[serde(crate = "near_sdk::serde")]
-struct FTMsg {
-    token_id: AccountId,
-    market_id: AccountId,
-    is_long: bool,
+struct FTOnTransferMsg {
+    token_account_id: AccountId,
+    market_id: u32,
+}
+
+fn transfer_reward(sender_id: AccountId, amount: U128) -> PromiseOrValue<U128> {
+    let promise = Promise::new(sender_id).transfer(amount.into());
+    PromiseOrValue::Promise(promise)
 }
 
 #[near_bindgen]
@@ -62,20 +68,50 @@ impl FungibleTokenReceiver for Factory {
         amount: U128,
         msg: String,
     ) -> PromiseOrValue<U128> {
-        // As mentioned, the `msg` argument contains information necessary for the receiving contract
-        // to know how to process the request. This may include method names and/or arguments.
+        let msg = serde_json::from_str::<FTOnTransferMsg>(&msg);
+        if msg.is_err() {
+            log!("Invalid message");
+            return PromiseOrValue::Value(amount);
+        };
+        let msg = msg.unwrap();
 
-        /*
-        - msg contains: token id, market id, long or short token
-        - call FT contract to burn the attached FT
-        - transfer associated amount of NEAR
-        */
+        let market = self.markets.get(msg.market_id);
+        if market.is_none() {
+            log!("Market does not exist");
+            return PromiseOrValue::Value(amount);
+        }
+        let market = market.unwrap();
 
-        let msg: FTMsg = serde_json::from_str(&msg).unwrap();
+        if market.is_open {
+            log!("Cannot withdraw from an open market");
+            return PromiseOrValue::Value(amount);
+        }
 
-        // Returns a value, or a promise which resolves with a value. The value is the
-        // number of unused tokens in string form. For instance, if `amount` is 10 but only 9 are
-        // needed, it will return "1".
-        todo!()
+        if market.is_long {
+            match msg.token_account_id {
+                token_account_id if token_account_id == market.long_token => {
+                    return transfer_reward(sender_id, amount);
+                }
+                token_account_id if token_account_id == market.short_token => {
+                    // burn FTs
+                    return PromiseOrValue::Value(U128::from(0));
+                }
+                _ => {}
+            }
+        } else {
+            match msg.token_account_id {
+                token_account_id if token_account_id == market.short_token => {
+                    return transfer_reward(sender_id, amount);
+                }
+                token_account_id if token_account_id == market.long_token => {
+                    // burn FTs
+                    return PromiseOrValue::Value(U128::from(0));
+                }
+                _ => {}
+            }
+        }
+
+        log!("This token is not related to any market");
+        PromiseOrValue::Value(amount)
     }
 }
