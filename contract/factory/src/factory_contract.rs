@@ -156,36 +156,36 @@ impl Factory {
         let dummy_account = env::predecessor_account_id();
 
         let market = Market::dummy(dummy_account.clone());
-        let storage_balance_market_cost =
-            factory.calculate_storage_cost(CalculateStorageCostParam::Market(market));
-        factory.market_storage_cost = storage_balance_market_cost;
+        factory.calculate_storage_cost(CalculateStorageCostParam::Market(market));
 
         let offer = Offer::dummy(dummy_account);
-        let storage_balance_offer_cost =
-            factory.calculate_storage_cost(CalculateStorageCostParam::Offer(offer));
-        factory.offer_storage_cost = storage_balance_offer_cost;
+        factory.calculate_storage_cost(CalculateStorageCostParam::Offer(offer));
 
         factory
     }
 
-    fn calculate_storage_cost(&mut self, param: CalculateStorageCostParam) -> Balance {
+    fn calculate_storage_cost(&mut self, param: CalculateStorageCostParam) {
         let storage_usage_before = env::storage_usage();
-        let storage_usage_after = match param {
+
+        match param {
             CalculateStorageCostParam::Market(market) => {
                 self.markets.push(market);
-                let storage_usage = env::storage_usage();
+                let storage_usage_after = env::storage_usage();
                 self.markets.clear();
-                storage_usage
+
+                self.market_storage_cost =
+                    (storage_usage_after - storage_usage_before) as u128 * env::storage_byte_cost()
             }
+
             CalculateStorageCostParam::Offer(offer) => {
                 self.offers.insert(offer.id, offer);
-                let storage_usage = env::storage_usage();
+                let storage_usage_after = env::storage_usage();
                 self.offers.clear();
-                storage_usage
+
+                self.offer_storage_cost =
+                    (storage_usage_after - storage_usage_before) as u128 * env::storage_byte_cost()
             }
         };
-
-        (storage_usage_after - storage_usage_before) as u128 * env::storage_byte_cost()
     }
 
     // ----- Market -----
