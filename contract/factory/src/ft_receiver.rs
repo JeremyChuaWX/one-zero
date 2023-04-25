@@ -1,8 +1,9 @@
 use near_contract_standards::fungible_token::{
-    receiver::FungibleTokenReceiver, resolver::FungibleTokenResolver,
+    receiver::FungibleTokenReceiver,
+    resolver::{ext_ft_resolver, FungibleTokenResolver},
 };
 use near_sdk::{
-    json_types::U128, log, near_bindgen, serde::Deserialize, serde_json, AccountId, Promise,
+    env, json_types::U128, log, near_bindgen, serde::Deserialize, serde_json, AccountId, Promise,
     PromiseOrValue,
 };
 
@@ -55,9 +56,20 @@ struct FTOnTransferMsg {
     market_id: u32,
 }
 
-fn transfer_reward(sender_id: AccountId, amount: U128) -> PromiseOrValue<U128> {
-    let promise = Promise::new(sender_id).transfer(amount.into());
-    PromiseOrValue::Promise(promise)
+#[near_bindgen]
+impl Factory {
+    fn transfer_reward(&self, sender_id: AccountId, amount: U128) -> PromiseOrValue<U128> {
+        let promise = Promise::new(sender_id)
+            .transfer(u128::from(amount) * 2)
+            .then(
+                ext_ft_resolver::ext(env::current_account_id()).ft_resolve_transfer(
+                    sender_id,
+                    env::current_account_id(),
+                    amount,
+                ),
+            );
+        PromiseOrValue::Promise(promise)
+    }
 }
 
 #[near_bindgen]
