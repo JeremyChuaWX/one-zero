@@ -112,7 +112,7 @@ impl Offer {
             market_id: 0,
             account_id: dummy_account,
             is_long: false,
-            amount: 123.into(),
+            amount: U128::from(123),
         }
     }
 }
