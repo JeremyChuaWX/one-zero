@@ -50,13 +50,13 @@ pub enum FactoryEvent {
 
 #[derive(BorshSerialize, BorshDeserialize)]
 pub struct Market {
-    id: u32,
-    description: String,
-    owner: AccountId,
-    is_open: bool,
-    is_long: bool,
-    long_token: AccountId,
-    short_token: AccountId,
+    pub id: u32,
+    pub description: String,
+    pub owner: AccountId,
+    pub is_open: bool,
+    pub is_long: bool,
+    pub long_token: AccountId,
+    pub short_token: AccountId,
 }
 
 impl Market {
@@ -76,11 +76,11 @@ impl Market {
 #[derive(Serialize)]
 #[serde(crate = "near_sdk::serde")]
 pub struct ViewMarket<'a> {
-    id: u32,
-    description: &'a str,
-    owner: &'a AccountId,
-    is_open: bool,
-    is_long: bool,
+    pub id: u32,
+    pub description: &'a str,
+    pub owner: &'a AccountId,
+    pub is_open: bool,
+    pub is_long: bool,
 }
 
 impl<'a> From<&'a Market> for ViewMarket<'a> {
@@ -98,11 +98,11 @@ impl<'a> From<&'a Market> for ViewMarket<'a> {
 #[derive(BorshSerialize, BorshDeserialize, Serialize, Deserialize, Debug, Clone)]
 #[serde(crate = "near_sdk::serde")]
 pub struct Offer {
-    id: u32,
-    market_id: u32,
-    account_id: AccountId,
-    is_long: bool,
-    amount: U128,
+    pub id: u32,
+    pub market_id: u32,
+    pub account_id: AccountId,
+    pub is_long: bool,
+    pub amount: U128,
 }
 
 impl Offer {
@@ -132,9 +132,9 @@ enum CalculateStorageCostParam {
 #[derive(BorshSerialize, BorshDeserialize, PanicOnDefault)]
 #[near_bindgen]
 pub struct Factory {
-    next_offer_id: u32,
-    markets: Vector<Market>,
-    offers: UnorderedMap<u32, Offer>,
+    pub next_offer_id: u32,
+    pub markets: Vector<Market>,
+    pub offers: UnorderedMap<u32, Offer>,
     pub storage_balances: LookupMap<AccountId, StorageBalance>,
     pub market_storage_cost: Balance,
     pub offer_storage_cost: Balance,
