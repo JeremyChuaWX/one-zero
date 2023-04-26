@@ -7,9 +7,8 @@ use near_sdk::{
 use near_sdk_contract_tools::standard::nep297::Event;
 
 use constants::GAS;
-use data::*;
-use events::*;
-use utils::token_deploy_cost;
+use data::{Market, Offer, TokenInitArgs};
+use events::MarketplaceEvent;
 
 pub mod constants;
 pub mod data;
@@ -77,7 +76,7 @@ impl Marketplace {
     }
 
     fn get_min_attached_balance() -> Balance {
-        let deploy_tokens_cost = token_deploy_cost() * 2;
+        let deploy_tokens_cost = utils::token_deploy_cost() * 2;
         let storage_cost = 0;
         deploy_tokens_cost + storage_cost
     }
