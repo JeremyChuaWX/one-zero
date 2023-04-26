@@ -1,6 +1,6 @@
 [workspace]
 
 members = [
-  "factory",
+  "marketplace",
   "token",
 ]
