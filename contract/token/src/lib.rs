@@ -31,14 +31,11 @@ impl Contract {
     #[init]
     pub fn new(owner: AccountId, metadata: FungibleTokenMetadata) -> Self {
         assert!(!env::state_exists(), "Already initialised");
-
         metadata.assert_valid();
-
         let mut this = Self {
             token: FungibleToken::new(StorageKey::Token),
             metadata: LazyOption::new(StorageKey::Metadata, Some(&metadata)),
         };
-
         this.token.internal_register_account(&owner);
         this
     }
