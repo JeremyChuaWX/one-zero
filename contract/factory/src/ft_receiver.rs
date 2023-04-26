@@ -56,10 +56,9 @@ struct FTOnTransferMsg {
     market_id: u32,
 }
 
-#[near_bindgen]
 impl Factory {
     fn transfer_reward(&self, sender_id: AccountId, amount: U128) -> PromiseOrValue<U128> {
-        let promise = Promise::new(sender_id)
+        let promise = Promise::new(sender_id.clone())
             .transfer(u128::from(amount) * 2)
             .then(
                 ext_ft_resolver::ext(env::current_account_id()).ft_resolve_transfer(
@@ -102,7 +101,7 @@ impl FungibleTokenReceiver for Factory {
         if market.is_long {
             match msg.token_account_id {
                 token_account_id if token_account_id == market.long_token => {
-                    return transfer_reward(sender_id, amount);
+                    return self.transfer_reward(sender_id, amount);
                 }
                 token_account_id if token_account_id == market.short_token => {
                     // burn FTs
@@ -113,7 +112,7 @@ impl FungibleTokenReceiver for Factory {
         } else {
             match msg.token_account_id {
                 token_account_id if token_account_id == market.short_token => {
-                    return transfer_reward(sender_id, amount);
+                    return self.transfer_reward(sender_id, amount);
                 }
                 token_account_id if token_account_id == market.long_token => {
                     // burn FTs
