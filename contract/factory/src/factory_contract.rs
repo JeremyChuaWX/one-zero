@@ -250,7 +250,8 @@ impl Factory {
         let short_promise = utils::deploy_token(short_account.clone(), &short_args);
 
         let attached = env::attached_deposit();
-        let total_deploy_cost = utils::calculate_deploy_cost() * 2; // TODO: need to add storage costs
+        let total_deploy_cost =
+            utils::calculate_deploy_cost() * 2 + self.offer_storage_cost + self.market_storage_cost;
 
         require!(
             attached >= total_deploy_cost,
@@ -265,7 +266,6 @@ impl Factory {
                 description,
                 long_account,
                 short_account,
-                // attached_deposit
             ))
     }
 
@@ -277,13 +277,10 @@ impl Factory {
         description: String,
         long_token: AccountId,
         short_token: AccountId,
-        // attached_deposit: u128,
     ) -> bool {
         if !is_promise_success() {
             return false;
         }
-
-        // TODO: check remaining attached deposit?
 
         let market = Market {
             id: market_id,
