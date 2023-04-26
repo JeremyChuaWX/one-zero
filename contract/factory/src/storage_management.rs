@@ -9,7 +9,6 @@ use crate::factory_contract::{Factory, FactoryExt};
 
 const ZERO: u128 = 0;
 
-#[near_bindgen]
 impl Factory {
     fn internal_register_account(&mut self, account_id: AccountId) {
         self.storage_balances.insert(
