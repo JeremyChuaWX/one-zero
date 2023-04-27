@@ -62,6 +62,11 @@ impl Marketplace {
         self.markets.iter().collect()
     }
 
+    // get the id that the next market would take
+    fn get_current_market_id(&self) -> u32 {
+        self.markets.len()
+    }
+
     // ---------- mutate methods ---------- //
 
     // get mutable reference to market with given id
@@ -69,16 +74,6 @@ impl Marketplace {
         self.markets
             .get_mut(market_id)
             .unwrap_or_else(|| env::panic_str("Market not found"))
-    }
-
-    fn get_current_market_id(&self) -> u32 {
-        self.markets.len()
-    }
-
-    fn get_min_attached_deposit() -> Balance {
-        let deploy_tokens_cost = utils::token_deploy_cost() * 2;
-        let storage_cost = 0;
-        deploy_tokens_cost + storage_cost
     }
 
     // `create_market` checks that attached deposit is sufficient before
