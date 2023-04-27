@@ -36,6 +36,18 @@ impl Market {
             description,
         }
     }
+
+    pub fn dummy() -> Self {
+        Self {
+            id: 0,
+            is_closed: false,
+            is_long: false,
+            owner: "".parse().unwrap(),
+            long_token: "".parse().unwrap(),
+            short_token: "".parse().unwrap(),
+            description: "".to_string(),
+        }
+    }
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Serialize, Deserialize, Clone)]
@@ -46,6 +58,18 @@ pub struct Offer {
     pub is_long: bool,
     pub account: AccountId,
     pub amount: U128,
+}
+
+impl Offer {
+    pub fn dummy() -> Self {
+        Self {
+            id: 0,
+            market: 0,
+            is_long: false,
+            account: "".parse().unwrap(),
+            amount: U128::from(123),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone)]
