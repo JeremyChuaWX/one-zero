@@ -90,8 +90,9 @@ impl Marketplace {
         let market_owner = env::predecessor_account_id();
         let marketplace = env::current_account_id();
         require!(
-            env::attached_deposit() >= Self::get_min_attached_deposit(),
-            "Insufficient attached balance"
+            env::attached_deposit()
+                >= (utils::token_storage_stake() * 2) + self.market_storage_stake,
+            "Insufficient attached balance for storage stakes"
         );
 
         // long token

@@ -4,7 +4,7 @@ use crate::constants::{gas, TOKEN_BYTES, ZERO};
 use crate::data::TokenInitArgs;
 
 // ---------- FT utils ---------- //
-pub fn token_deploy_cost() -> Balance {
+pub fn token_storage_stake() -> Balance {
     (TOKEN_BYTES.to_vec().len() as u128) * env::STORAGE_PRICE_PER_BYTE
 }
 
@@ -22,7 +22,7 @@ pub fn format_token_account_id(symbol: &str, owner: AccountId) -> AccountId {
 pub fn format_deploy_token_promise(account_id: AccountId, args: &TokenInitArgs) -> Promise {
     Promise::new(account_id)
         .create_account()
-        .transfer(token_deploy_cost())
+        .transfer(token_storage_stake())
         .deploy_contract(TOKEN_BYTES.to_vec())
         .function_call(
             "new".to_string(),
