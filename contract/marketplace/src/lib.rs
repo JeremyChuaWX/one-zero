@@ -4,7 +4,7 @@ use near_sdk::{
     store::{UnorderedMap, Vector},
     AccountId, Balance, BorshStorageKey, Promise,
 };
-use near_sdk_contract_tools::{standard::nep297::Event, utils::apply_storage_fee_and_refund};
+use near_sdk_contract_tools::standard::nep297::Event;
 
 use constants::gas;
 use data::{Market, Offer, TokenInitArgs};
@@ -26,6 +26,8 @@ enum StorageKey {
 pub struct Marketplace {
     markets: Vector<Market>,
     offers: UnorderedMap<u32, Offer>,
+    market_storage_stake: Balance,
+    offer_storage_stake: Balance,
 }
 
 impl Default for Marketplace {
@@ -36,12 +38,34 @@ impl Default for Marketplace {
 
 #[near_bindgen]
 impl Marketplace {
+    fn calculate_storage_stake(&mut self) {
+        // market
+        let storage_usage_before = env::storage_usage();
+        self.markets.push(Market::dummy());
+        let storage_usage_after = env::storage_usage();
+        self.markets.clear();
+        let storage_usage: u128 = (storage_usage_after - storage_usage_before).into();
+        self.market_storage_stake = storage_usage * env::storage_byte_cost();
+
+        // offer
+        let storage_usage_before = env::storage_usage();
+        self.offers.insert(0, Offer::dummy());
+        let storage_usage_after = env::storage_usage();
+        self.offers.clear();
+        let storage_usage: u128 = (storage_usage_after - storage_usage_before).into();
+        self.offer_storage_stake = storage_usage * env::storage_byte_cost();
+    }
+
     #[init]
     pub fn new() -> Self {
-        Self {
+        let mut this = Self {
             markets: Vector::new(StorageKey::Market),
             offers: UnorderedMap::new(StorageKey::Offer),
-        }
+            market_storage_stake: 0,
+            offer_storage_stake: 0,
+        };
+        this.calculate_storage_stake();
+        this
     }
 }
 
