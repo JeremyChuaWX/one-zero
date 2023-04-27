@@ -4,7 +4,7 @@ use near_sdk::{
     store::{UnorderedMap, Vector},
     AccountId, Balance, BorshStorageKey, Promise,
 };
-use near_sdk_contract_tools::standard::nep297::Event;
+use near_sdk_contract_tools::{standard::nep297::Event, utils::apply_storage_fee_and_refund};
 
 use constants::GAS;
 use data::{Market, Offer, TokenInitArgs};
@@ -75,7 +75,7 @@ impl Marketplace {
         self.markets.len()
     }
 
-    fn get_min_attached_balance() -> Balance {
+    fn get_min_attached_deposit() -> Balance {
         let deploy_tokens_cost = utils::token_deploy_cost() * 2;
         let storage_cost = 0;
         deploy_tokens_cost + storage_cost
@@ -90,7 +90,7 @@ impl Marketplace {
         let market_owner = env::predecessor_account_id();
         let marketplace = env::current_account_id();
         require!(
-            env::attached_deposit() >= Self::get_min_attached_balance(),
+            env::attached_deposit() >= Self::get_min_attached_deposit(),
             "Insufficient attached balance"
         );
 
