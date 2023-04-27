@@ -2,11 +2,11 @@ use near_sdk::{
     borsh::{self, BorshDeserialize, BorshSerialize},
     env, is_promise_success, near_bindgen, require,
     store::{UnorderedMap, Vector},
-    AccountId, Balance, BorshStorageKey, Promise,
+    AccountId, BorshStorageKey, Promise, StorageUsage,
 };
 use near_sdk_contract_tools::standard::nep297::Event;
 
-use constants::gas;
+use constants::{gas, TOKEN_BYTES_LENGTH};
 use data::{Market, Offer, TokenInitArgs};
 use events::MarketplaceEvent;
 
@@ -26,8 +26,8 @@ enum StorageKey {
 pub struct Marketplace {
     markets: Vector<Market>,
     offers: UnorderedMap<u32, Offer>,
-    market_storage_stake: Balance,
-    offer_storage_stake: Balance,
+    market_storage_usage: StorageUsage,
+    offer_storage_usage: StorageUsage,
 }
 
 impl Default for Marketplace {
@@ -44,16 +44,16 @@ impl Marketplace {
         self.markets.push(Market::dummy());
         let storage_usage_after = env::storage_usage();
         self.markets.clear();
-        let storage_usage: u128 = (storage_usage_after - storage_usage_before).into();
-        self.market_storage_stake = storage_usage * env::storage_byte_cost();
+        let storage_usage: u64 = (storage_usage_after - storage_usage_before).into();
+        self.market_storage_usage = storage_usage;
 
         // offer
         let storage_usage_before = env::storage_usage();
         self.offers.insert(0, Offer::dummy());
         let storage_usage_after = env::storage_usage();
         self.offers.clear();
-        let storage_usage: u128 = (storage_usage_after - storage_usage_before).into();
-        self.offer_storage_stake = storage_usage * env::storage_byte_cost();
+        let storage_usage: u64 = (storage_usage_after - storage_usage_before).into();
+        self.offer_storage_usage = storage_usage;
     }
 
     #[init]
@@ -61,8 +61,8 @@ impl Marketplace {
         let mut this = Self {
             markets: Vector::new(StorageKey::Market),
             offers: UnorderedMap::new(StorageKey::Offer),
-            market_storage_stake: 0,
-            offer_storage_stake: 0,
+            market_storage_usage: 0,
+            offer_storage_usage: 0,
         };
         this.calculate_storage_stake();
         this
@@ -110,7 +110,8 @@ impl Marketplace {
         let marketplace = env::current_account_id();
         require!(
             env::attached_deposit()
-                >= (utils::token_storage_stake() * 2) + self.market_storage_stake,
+                >= ((TOKEN_BYTES_LENGTH * 2) + self.market_storage_usage) as u128
+                    * env::storage_byte_cost(),
             "Insufficient attached balance for storage stakes"
         );
 
