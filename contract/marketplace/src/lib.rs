@@ -6,7 +6,7 @@ use near_sdk::{
 };
 use near_sdk_contract_tools::{standard::nep297::Event, utils::apply_storage_fee_and_refund};
 
-use constants::GAS;
+use constants::gas;
 use data::{Market, Offer, TokenInitArgs};
 use events::MarketplaceEvent;
 
@@ -118,7 +118,7 @@ impl Marketplace {
         // deploy tokens
         long_promise.and(short_promise).then(
             Self::ext(marketplace)
-                .with_static_gas(GAS)
+                .with_static_gas(gas::CREATE_MARKET)
                 .on_create_market(
                     market_id,
                     market_owner,

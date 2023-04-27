@@ -1,11 +1,11 @@
 use near_sdk::{env, require, serde_json, AccountId, Balance, Promise};
 
-use crate::constants::{GAS, TOKEN_CONTRACT, ZERO};
+use crate::constants::{gas, TOKEN_BYTES, ZERO};
 use crate::data::TokenInitArgs;
 
 // ---------- FT utils ---------- //
 pub fn token_deploy_cost() -> Balance {
-    (TOKEN_CONTRACT.to_vec().len() as u128) * env::STORAGE_PRICE_PER_BYTE
+    (TOKEN_BYTES.to_vec().len() as u128) * env::STORAGE_PRICE_PER_BYTE
 }
 
 pub fn format_token_account_id(symbol: &str, owner: AccountId) -> AccountId {
@@ -23,11 +23,11 @@ pub fn format_deploy_token_promise(account_id: AccountId, args: &TokenInitArgs) 
     Promise::new(account_id)
         .create_account()
         .transfer(token_deploy_cost())
-        .deploy_contract(TOKEN_CONTRACT.to_vec())
+        .deploy_contract(TOKEN_BYTES.to_vec())
         .function_call(
             "new".to_string(),
             serde_json::to_vec(args).unwrap(),
             ZERO,
-            GAS,
+            gas::INIT_TOKEN,
         )
 }
