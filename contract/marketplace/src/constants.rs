@@ -1,6 +1,6 @@
 pub const TOKEN_BYTES: &[u8] =
     include_bytes!("../../target/wasm32-unknown-unknown/release/token.wasm");
-pub const TOKEN_BYTES_LENGTH: u64 = TOKEN_BYTES.to_vec().len() as u64;
+pub const TOKEN_BYTES_LENGTH: usize = TOKEN_BYTES.to_vec().len();
 pub const ZERO: u128 = 0;
 
 pub mod gas {

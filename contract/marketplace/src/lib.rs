@@ -2,13 +2,14 @@ use near_sdk::{
     borsh::{self, BorshDeserialize, BorshSerialize},
     env, is_promise_success, near_bindgen, require,
     store::{UnorderedMap, Vector},
-    AccountId, BorshStorageKey, Promise, StorageUsage,
+    AccountId, Balance, BorshStorageKey, Promise,
 };
 use near_sdk_contract_tools::standard::nep297::Event;
 
-use constants::{gas, TOKEN_BYTES_LENGTH};
+use constants::gas;
 use data::{Market, Offer, TokenInitArgs};
 use events::MarketplaceEvent;
+use utils::format_refund_deposit_promise;
 
 pub mod constants;
 pub mod data;
@@ -26,8 +27,8 @@ enum StorageKey {
 pub struct Marketplace {
     markets: Vector<Market>,
     offers: UnorderedMap<u32, Offer>,
-    market_storage_usage: StorageUsage,
-    offer_storage_usage: StorageUsage,
+    market_storage_stake: Balance,
+    offer_storage_stake: Balance,
 }
 
 impl Default for Marketplace {
@@ -45,7 +46,7 @@ impl Marketplace {
         let storage_usage_after = env::storage_usage();
         self.markets.clear();
         let storage_usage: u64 = (storage_usage_after - storage_usage_before).into();
-        self.market_storage_usage = storage_usage;
+        self.market_storage_stake = storage_usage as u128 * env::storage_byte_cost();
 
         // offer
         let storage_usage_before = env::storage_usage();
@@ -53,7 +54,7 @@ impl Marketplace {
         let storage_usage_after = env::storage_usage();
         self.offers.clear();
         let storage_usage: u64 = (storage_usage_after - storage_usage_before).into();
-        self.offer_storage_usage = storage_usage;
+        self.offer_storage_stake = storage_usage as u128 * env::storage_byte_cost();
     }
 
     #[init]
@@ -61,8 +62,8 @@ impl Marketplace {
         let mut this = Self {
             markets: Vector::new(StorageKey::Market),
             offers: UnorderedMap::new(StorageKey::Offer),
-            market_storage_usage: 0,
-            offer_storage_usage: 0,
+            market_storage_stake: 0,
+            offer_storage_stake: 0,
         };
         this.calculate_storage_stake();
         this
@@ -91,6 +92,11 @@ impl Marketplace {
         self.markets.len()
     }
 
+    // get the min deposit for creating a market
+    fn get_create_market_min_deposit(&self) -> Balance {
+        utils::token_storage_stake() + self.market_storage_stake
+    }
+
     // ---------- mutate methods ---------- //
 
     // get mutable reference to market with given id
@@ -108,10 +114,9 @@ impl Marketplace {
         let market_id = self.get_current_market_id();
         let market_owner = env::predecessor_account_id();
         let marketplace = env::current_account_id();
+        let attached_deposit = env::attached_deposit();
         require!(
-            env::attached_deposit()
-                >= ((TOKEN_BYTES_LENGTH * 2) + self.market_storage_usage) as u128
-                    * env::storage_byte_cost(),
+            attached_deposit >= self.get_create_market_min_deposit(),
             "Insufficient attached balance for storage stakes"
         );
 
@@ -146,6 +151,7 @@ impl Marketplace {
                     long_account_id,
                     short_account_id,
                     description,
+                    attached_deposit,
                 ),
         )
     }
@@ -159,7 +165,8 @@ impl Marketplace {
         long_token: AccountId,
         short_token: AccountId,
         description: String,
-    ) -> bool {
+        attached_deposit: Balance,
+    ) {
         if is_promise_success() {
             let market = Market::new(
                 market_id,
@@ -169,11 +176,16 @@ impl Marketplace {
                 description,
             );
             self.markets.push(market);
-
             MarketplaceEvent::MarketCreated {}.emit();
-            true
+            format_refund_deposit_promise(
+                market_owner,
+                attached_deposit - self.get_create_market_min_deposit(),
+            );
         } else {
-            false
+            format_refund_deposit_promise(
+                market_owner,
+                attached_deposit - utils::token_storage_stake(),
+            );
         }
     }
 

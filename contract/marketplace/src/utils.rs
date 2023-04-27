@@ -3,12 +3,10 @@ use near_sdk::{env, require, serde_json, AccountId, Balance, Promise};
 use crate::constants::{gas, TOKEN_BYTES, TOKEN_BYTES_LENGTH, ZERO};
 use crate::data::TokenInitArgs;
 
-// ---------- storage utils ---------- //
-pub fn bytes_to_stake(bytes: u64) -> Balance {
-    (bytes as Balance) * env::storage_byte_cost()
+pub fn token_storage_stake() -> Balance {
+    (TOKEN_BYTES_LENGTH as u128) * env::storage_byte_cost()
 }
 
-// ---------- token utils ---------- //
 pub fn format_token_account_id(symbol: &str, owner: AccountId) -> AccountId {
     let token_account_id: AccountId = format!("{}.{}", symbol.to_ascii_lowercase(), owner)
         .parse()
@@ -23,7 +21,7 @@ pub fn format_token_account_id(symbol: &str, owner: AccountId) -> AccountId {
 pub fn format_deploy_token_promise(account_id: AccountId, args: &TokenInitArgs) -> Promise {
     Promise::new(account_id)
         .create_account()
-        .transfer(bytes_to_stake(TOKEN_BYTES_LENGTH))
+        .transfer(token_storage_stake())
         .deploy_contract(TOKEN_BYTES.to_vec())
         .function_call(
             "new".to_string(),
@@ -31,4 +29,8 @@ pub fn format_deploy_token_promise(account_id: AccountId, args: &TokenInitArgs) 
             ZERO,
             gas::INIT_TOKEN,
         )
+}
+
+pub fn format_refund_deposit_promise(account_id: AccountId, amount: Balance) -> Promise {
+    Promise::new(account_id).transfer(amount)
 }
