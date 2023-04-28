@@ -92,8 +92,8 @@ impl Marketplace {
     }
 
     // get the min deposit for creating a market
-    fn get_create_market_min_deposit(&self) -> Balance {
-        utils::token_storage_stake() + self.market_storage_stake
+    pub fn get_create_market_min_deposit(&self) -> Balance {
+        utils::token_storage_stake() * 2 + self.market_storage_stake
     }
 
     // ---------- mutate methods ---------- //
