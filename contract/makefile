@@ -1,7 +1,7 @@
 build:
 	cargo build --target wasm32-unknown-unknown --release
 
-dev-deploy:
+dev-deploy: build
 	set -e; \
 	WASM_PATH="./target/wasm32-unknown-unknown/release/marketplace.wasm"; \
 	near dev-deploy \
