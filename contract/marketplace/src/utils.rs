@@ -30,7 +30,3 @@ pub fn format_deploy_token_promise(account_id: AccountId, args: &TokenInitArgs) 
             gas::INIT_TOKEN,
         )
 }
-
-pub fn format_refund_deposit_promise(account_id: AccountId, amount: Balance) -> Promise {
-    Promise::new(account_id).transfer(amount)
-}

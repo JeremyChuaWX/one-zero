@@ -9,7 +9,6 @@ use near_sdk_contract_tools::standard::nep297::Event;
 use constants::gas;
 use data::{Market, Offer, TokenInitArgs};
 use events::MarketplaceEvent;
-use utils::format_refund_deposit_promise;
 
 pub mod constants;
 pub mod data;
@@ -45,7 +44,7 @@ impl Marketplace {
         self.markets.push(Market::dummy());
         let storage_usage_after = env::storage_usage();
         self.markets.clear();
-        let storage_usage: u64 = (storage_usage_after - storage_usage_before).into();
+        let storage_usage = storage_usage_after - storage_usage_before;
         self.market_storage_stake = storage_usage as u128 * env::storage_byte_cost();
 
         // offer
@@ -53,7 +52,7 @@ impl Marketplace {
         self.offers.insert(0, Offer::dummy());
         let storage_usage_after = env::storage_usage();
         self.offers.clear();
-        let storage_usage: u64 = (storage_usage_after - storage_usage_before).into();
+        let storage_usage = storage_usage_after - storage_usage_before;
         self.offer_storage_stake = storage_usage as u128 * env::storage_byte_cost();
     }
 
@@ -170,22 +169,18 @@ impl Marketplace {
         if is_promise_success() {
             let market = Market::new(
                 market_id,
-                market_owner,
+                market_owner.clone(),
                 long_token,
                 short_token,
                 description,
             );
             self.markets.push(market);
             MarketplaceEvent::MarketCreated {}.emit();
-            format_refund_deposit_promise(
-                market_owner,
-                attached_deposit - self.get_create_market_min_deposit(),
-            );
+            let refund = attached_deposit - self.get_create_market_min_deposit();
+            Promise::new(market_owner).transfer(refund);
         } else {
-            format_refund_deposit_promise(
-                market_owner,
-                attached_deposit - utils::token_storage_stake(),
-            );
+            let refund = attached_deposit - utils::token_storage_stake();
+            Promise::new(market_owner).transfer(refund);
         }
     }
 
