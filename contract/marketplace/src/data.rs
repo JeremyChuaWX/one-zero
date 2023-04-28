@@ -42,10 +42,10 @@ impl Market {
             id: 0,
             is_closed: false,
             is_long: false,
-            owner: "".parse().unwrap(),
-            long_token: "".parse().unwrap(),
-            short_token: "".parse().unwrap(),
-            description: "".to_string(),
+            owner: "test".parse().unwrap(),
+            long_token: "test".parse().unwrap(),
+            short_token: "test".parse().unwrap(),
+            description: "test".to_string(),
         }
     }
 }
@@ -66,7 +66,7 @@ impl Offer {
             id: 0,
             market: 0,
             is_long: false,
-            account: "".parse().unwrap(),
+            account: "test".parse().unwrap(),
             amount: U128::from(123),
         }
     }
