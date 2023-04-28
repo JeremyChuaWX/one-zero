@@ -179,8 +179,7 @@ impl Marketplace {
             let refund = attached_deposit - self.get_create_market_min_deposit();
             Promise::new(market_owner).transfer(refund);
         } else {
-            let refund = attached_deposit - utils::token_storage_stake();
-            Promise::new(market_owner).transfer(refund);
+            Promise::new(market_owner).transfer(attached_deposit);
         }
     }
 
