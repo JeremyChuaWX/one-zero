@@ -1,5 +1,5 @@
 build:
-	cargo build --target wasm32-unknown-unknown --release
+	RUSTFLAGS='-C link-arg=-s' cargo build --target wasm32-unknown-unknown --release
 
 dev-deploy: build
 	set -e; \
