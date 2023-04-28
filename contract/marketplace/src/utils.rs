@@ -1,10 +1,10 @@
 use near_sdk::{env, require, serde_json, AccountId, Balance, Promise};
 
-use crate::constants::{gas, TOKEN_BYTES, TOKEN_BYTES_LENGTH, ZERO};
+use crate::constants::{gas, EXTRA_BYTES, TOKEN_BYTES, ZERO};
 use crate::data::TokenInitArgs;
 
 pub fn token_storage_stake() -> Balance {
-    (TOKEN_BYTES_LENGTH as u128) * env::storage_byte_cost()
+    (TOKEN_BYTES.to_vec().len() as u128 + EXTRA_BYTES) * env::storage_byte_cost()
 }
 
 pub fn format_token_account_id(symbol: &str, owner: AccountId) -> AccountId {
