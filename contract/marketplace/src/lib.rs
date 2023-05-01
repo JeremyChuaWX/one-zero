@@ -100,6 +100,16 @@ impl Marketplace {
         utils::token_storage_stake() * 2 + self.market_storage_stake
     }
 
+    // check if market exists
+    fn market_exists(&self, market_id: u32) -> bool {
+        self.markets.get(market_id).is_some()
+    }
+
+    // get the id that the next market would take
+    fn get_current_market_id(&self) -> u32 {
+        self.markets.len()
+    }
+
     // ---------- mutate methods ---------- //
 
     // get mutable reference to market with given id
