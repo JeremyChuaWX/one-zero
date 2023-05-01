@@ -13,6 +13,5 @@ This contract creates markets and processes offers.
 ## Todo
 
 - [ ] Event implementations
-- [ ] Track deposits from offers
 - [ ] Storage management
 - [ ] FT resolver & receiver implementations
