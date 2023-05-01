@@ -249,6 +249,14 @@ impl Marketplace {
 
     // ---------- mutate methods ---------- //
 
+    // remove offer with given offer id
+    // panic if offer not found
+    fn remove_offer(&mut self, offer_id: u32) -> Offer {
+        self.offers
+            .remove(&offer_id)
+            .unwrap_or_else(|| env::panic_str("Offer not found"))
+    }
+
     // `create_offer` checks that attached deposit is sufficient before
     // parsing given offer metadata, and generate a new offer from it
     // !! offer owner == predecessor
