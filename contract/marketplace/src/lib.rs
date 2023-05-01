@@ -39,7 +39,7 @@ impl Default for Marketplace {
     }
 }
 
-/// ---------- util methods ---------- ///
+// ---------- util methods ---------- //
 #[near_bindgen]
 impl Marketplace {
     fn calculate_storage_stake(&mut self) {
@@ -74,12 +74,12 @@ impl Marketplace {
     }
 }
 
-/// ---------- market methods ---------- ///
+// ---------- market methods ---------- //
 #[near_bindgen]
 impl Marketplace {
-    /// ---------- view methods ---------- ///
+    // ---------- view methods ---------- //
 
-    /// internal methods --------------------
+    // internal methods --------------------
 
     /// check if market exists
     fn market_exists(&self, market_id: u32) -> bool {
@@ -91,7 +91,7 @@ impl Marketplace {
         self.markets.len()
     }
 
-    /// public methods --------------------
+    // public methods --------------------
 
     /// get market with given id
     pub fn get_market(&self, market_id: u32) -> &Market {
@@ -110,9 +110,9 @@ impl Marketplace {
         helpers::token_storage_stake() * 2 + self.market_storage_stake
     }
 
-    /// ---------- mutate methods ---------- ///
+    // ---------- mutate methods ---------- //
 
-    /// internal methods --------------------
+    // internal methods --------------------
 
     /// get mutable reference to market with given id
     fn get_mut_market(&mut self, market_id: u32) -> &mut Market {
@@ -121,7 +121,7 @@ impl Marketplace {
             .unwrap_or_else(|| env::panic_str("Market not found"))
     }
 
-    /// public methods --------------------
+    // public methods --------------------
 
     /// `create_market` checks that attached deposit is sufficient before
     /// parsing given market metadata, and generate a new market from it
@@ -221,14 +221,14 @@ impl Marketplace {
     }
 }
 
-/// ---------- offer methods ---------- ///
+// ---------- offer methods ---------- //
 #[near_bindgen]
 impl Marketplace {
-    /// ---------- view methods ---------- ///
+    // ---------- view methods ---------- //
 
-    /// internal methods --------------------
+    // internal methods --------------------
 
-    /// public methods --------------------
+    // public methods --------------------
 
     /// get offer with given id
     pub fn get_offer(&self, offer_id: u32) -> &Offer {
@@ -256,9 +256,9 @@ impl Marketplace {
             .collect()
     }
 
-    /// ---------- mutate methods ---------- ///
+    // ---------- mutate methods ---------- //
 
-    /// internal methods --------------------
+    // internal methods --------------------
 
     /// remove offer with given offer id
     /// panic if offer not found
@@ -268,7 +268,7 @@ impl Marketplace {
             .unwrap_or_else(|| env::panic_str("Offer not found"))
     }
 
-    /// public methods --------------------
+    // public methods --------------------
 
     /// `create_offer` checks that attached deposit is sufficient before
     /// parsing given offer metadata, and generate a new offer from it
@@ -301,8 +301,8 @@ impl Marketplace {
         }
     }
 
-    //// `cancel_offer` checks that offer exists, then refunding the offered amount
-    //// and removing the offer from the Marketplace
+    /// `cancel_offer` checks that offer exists, then refunding the offered amount
+    /// and removing the offer from the Marketplace
     pub fn cancel_offer(&mut self, offer_id: u32) {
         let offer = self.remove_offer(offer_id);
         require!(
@@ -312,8 +312,8 @@ impl Marketplace {
         Promise::new(env::predecessor_account_id()).transfer(Balance::from(offer.amount));
     }
 
-    //// `accept_offer` checks that offer is open, attached deposit is sufficient,
-    //// and predecessor does not own it before accepting the offer and removing it
+    /// `accept_offer` checks that offer is open, attached deposit is sufficient,
+    /// and predecessor does not own it before accepting the offer and removing it
     #[payable]
     pub fn accept_offer(&mut self, offer_id: u32) {
         let offer = self.remove_offer(offer_id);
