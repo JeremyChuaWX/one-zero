@@ -1,6 +1,8 @@
 use near_sdk::{
     borsh::{self, BorshDeserialize, BorshSerialize},
-    env, near_bindgen, require,
+    env,
+    json_types::U128,
+    near_bindgen, require,
     store::{UnorderedMap, Vector},
     AccountId, Balance, BorshStorageKey, Promise,
 };
@@ -239,7 +241,14 @@ impl Marketplace {
     // parsing given offer metadata, and generate a new offer from it
     // !! offer owner == predecessor
     #[payable]
-    pub fn create_offer(&mut self) {
+    pub fn create_offer(&mut self, market: u32, is_long: bool, amount: U128) {
+        /*
+        - check deposit is sufficient
+        - create offer
+        - lock up NEAR
+        - increment offer id
+        */
+
         MarketplaceEvent::OfferCreated {}.emit();
         todo!()
     }
