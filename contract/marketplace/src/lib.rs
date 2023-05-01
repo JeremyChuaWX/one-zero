@@ -26,11 +26,11 @@ enum StorageKey {
 #[near_bindgen]
 #[derive(BorshSerialize, BorshDeserialize)]
 pub struct Marketplace {
-    next_offer_id: u32,
-    markets: Vector<Market>,
-    offers: UnorderedMap<u32, Offer>,
-    market_storage_stake: Balance,
-    offer_storage_stake: Balance,
+    pub next_offer_id: u32,
+    pub markets: Vector<Market>,
+    pub offers: UnorderedMap<u32, Offer>,
+    pub market_storage_stake: Balance,
+    pub offer_storage_stake: Balance,
 }
 
 impl Default for Marketplace {
