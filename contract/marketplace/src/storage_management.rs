@@ -6,8 +6,10 @@ use crate::{Marketplace, MarketplaceExt};
 #[near_bindgen]
 impl Marketplace {
     pub fn storage_register_account(&mut self, account: Option<AccountId>) {
-        self.storage_deposits
-            .insert(helpers::valid_account_or_predecessor(account), 0);
+        let account = helpers::valid_account_or_predecessor(account);
+        if self.storage_deposits.contains_key(&account) {
+            self.storage_deposits.insert(account, 0);
+        }
     }
 
     /// get the storage balance of specified account
