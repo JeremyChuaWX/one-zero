@@ -194,7 +194,11 @@ impl Marketplace {
                 description,
             );
             self.markets.push(market);
-            MarketplaceEvent::MarketCreated {}.emit();
+            MarketplaceEvent::MarketCreated {
+                id: market_id,
+                description: description.clone(),
+            }
+            .emit();
             let refund = attached_deposit - self.get_create_market_min_deposit();
             if refund > 0 {
                 Promise::new(market_owner).transfer(refund);
@@ -218,7 +222,12 @@ impl Marketplace {
         );
         market.is_closed = true;
         market.is_long = is_long;
-        MarketplaceEvent::MarketClosed {}.emit();
+        MarketplaceEvent::MarketClosed {
+            id: market.id,
+            description: market.description,
+            is_long: market.is_long,
+        }
+        .emit();
     }
 }
 
@@ -297,7 +306,13 @@ impl Marketplace {
             },
         );
         self.next_offer_id += 1;
-        MarketplaceEvent::OfferCreated {}.emit();
+        MarketplaceEvent::OfferCreated {
+            id: offer_id,
+            market,
+            amount,
+            is_long,
+        }
+        .emit();
         let refund = attached_deposit - Balance::from(amount);
         if refund > 0 {
             Promise::new(account).transfer(refund);
@@ -329,7 +344,13 @@ impl Marketplace {
             attached_deposit >= Balance::from(offer.amount),
             "Insufficient attached balance"
         );
-        MarketplaceEvent::OfferAccepted {}.emit();
+        MarketplaceEvent::OfferAccepted {
+            id: offer.id,
+            market: offer.market,
+            amount: offer.amount,
+            is_long: offer.is_long,
+        }
+        .emit();
         let refund = attached_deposit - Balance::from(offer.amount);
         if refund > 0 {
             Promise::new(env::predecessor_account_id()).transfer(refund);

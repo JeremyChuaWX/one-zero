@@ -1,3 +1,4 @@
+use near_sdk::json_types::U128;
 use near_sdk_contract_tools::event;
 
 #[event(
@@ -7,10 +8,27 @@ use near_sdk_contract_tools::event;
 )]
 pub enum MarketplaceEvent {
     // ---------- market events ---------- //
-    MarketCreated {},
-    MarketClosed {},
+    MarketCreated {
+        id: u32,
+        description: String,
+    },
+    MarketClosed {
+        id: u32,
+        description: String,
+        is_long: bool,
+    },
 
     // ---------- offer events ---------- //
-    OfferCreated {},
-    OfferAccepted {},
+    OfferCreated {
+        id: u32,
+        market: u32,
+        amount: U128,
+        is_long: bool,
+    },
+    OfferAccepted {
+        id: u32,
+        market: u32,
+        amount: U128,
+        is_long: bool,
+    },
 }
