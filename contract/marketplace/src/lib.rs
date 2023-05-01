@@ -166,7 +166,7 @@ impl Marketplace {
         description: String,
         attached_deposit: Balance,
     ) {
-        if env::promise_results_count() > 0 {
+        if env::promise_results_count() == 2 {
             let market = Market::new(
                 market_id,
                 market_owner.clone(),
