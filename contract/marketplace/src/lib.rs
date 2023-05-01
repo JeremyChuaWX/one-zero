@@ -2,13 +2,14 @@ pub mod constants;
 pub mod data;
 pub mod events;
 pub mod helpers;
+pub mod storage_management;
 
 use near_sdk::{
     borsh::{self, BorshDeserialize, BorshSerialize},
     env,
     json_types::U128,
     near_bindgen, require,
-    store::{UnorderedMap, Vector},
+    store::{LookupMap, UnorderedMap, Vector},
     AccountId, Balance, BorshStorageKey, Promise, ONE_NEAR,
 };
 use near_sdk_contract_tools::standard::nep297::Event;
@@ -21,6 +22,7 @@ use events::MarketplaceEvent;
 enum StorageKey {
     Market,
     Offer,
+    StorageDeposit,
 }
 
 #[near_bindgen]
@@ -31,6 +33,7 @@ pub struct Marketplace {
     pub offers: UnorderedMap<u32, Offer>,
     pub market_storage_stake: Balance,
     pub offer_storage_stake: Balance,
+    pub storage_deposits: LookupMap<AccountId, Balance>,
 }
 
 impl Default for Marketplace {
@@ -68,6 +71,7 @@ impl Marketplace {
             offers: UnorderedMap::new(StorageKey::Offer),
             market_storage_stake: 0,
             offer_storage_stake: 0,
+            storage_deposits: LookupMap::new(StorageKey::StorageDeposit),
         };
         this.calculate_storage_stake();
         this
