@@ -37,3 +37,19 @@ pub fn refund(account: AccountId, attached_deposit: Balance, amount: Balance) {
         Promise::new(account).transfer(refund);
     }
 }
+
+/// if account id passed is valid, return it, else return predecessor
+pub fn valid_account_or_predecessor(account: Option<AccountId>) -> AccountId {
+    match account {
+        Some(account) if env::is_valid_account_id(account.as_bytes()) => account,
+        _ => env::predecessor_account_id(),
+    }
+}
+
+/// if amount is defined, return it, else return entire attached deposit
+pub fn amount_or_attached_deposit(amount: Option<Balance>) -> Balance {
+    match amount {
+        Some(amount) => amount,
+        None => env::attached_deposit(),
+    }
+}
