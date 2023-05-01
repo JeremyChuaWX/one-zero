@@ -26,6 +26,7 @@ enum StorageKey {
 #[near_bindgen]
 #[derive(BorshSerialize, BorshDeserialize)]
 pub struct Marketplace {
+    next_offer_id: u32,
     markets: Vector<Market>,
     offers: UnorderedMap<u32, Offer>,
     market_storage_stake: Balance,
@@ -61,6 +62,7 @@ impl Marketplace {
     #[init]
     pub fn new() -> Self {
         let mut this = Self {
+            next_offer_id: 0,
             markets: Vector::new(StorageKey::Market),
             offers: UnorderedMap::new(StorageKey::Offer),
             market_storage_stake: 0,
