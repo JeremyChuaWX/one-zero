@@ -196,7 +196,9 @@ impl Marketplace {
             self.markets.push(market);
             MarketplaceEvent::MarketCreated {}.emit();
             let refund = attached_deposit - self.get_create_market_min_deposit();
-            Promise::new(market_owner).transfer(refund);
+            if refund > 0 {
+                Promise::new(market_owner).transfer(refund);
+            }
         } else {
             Promise::new(market_owner).transfer(attached_deposit);
         }
