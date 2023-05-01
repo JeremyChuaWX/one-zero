@@ -1,6 +1,6 @@
 use near_sdk::{
     borsh::{self, BorshDeserialize, BorshSerialize},
-    env, is_promise_success, near_bindgen, require,
+    env, near_bindgen, require,
     store::{UnorderedMap, Vector},
     AccountId, Balance, BorshStorageKey, Promise,
 };
@@ -166,7 +166,7 @@ impl Marketplace {
         description: String,
         attached_deposit: Balance,
     ) {
-        if is_promise_success() {
+        if env::promise_results_count() > 0 {
             let market = Market::new(
                 market_id,
                 market_owner.clone(),
