@@ -218,7 +218,6 @@ impl Marketplace {
         );
         market.is_closed = true;
         market.is_long = is_long;
-
         MarketplaceEvent::MarketClosed {}.emit();
     }
 }
@@ -287,14 +286,16 @@ impl Marketplace {
         let offer_id = self.next_offer_id;
         let account = env::predecessor_account_id();
         let amount = U128::from(u128::from(amount) * ONE_NEAR);
-        let offer = Offer {
-            id: offer_id,
-            market,
-            is_long,
-            account: account.clone(),
-            amount,
-        };
-        self.offers.insert(offer_id, offer);
+        self.offers.insert(
+            offer_id,
+            Offer {
+                id: offer_id,
+                market,
+                is_long,
+                account: account.clone(),
+                amount,
+            },
+        );
         self.next_offer_id += 1;
         MarketplaceEvent::OfferCreated {}.emit();
         let refund = attached_deposit - Balance::from(amount);
