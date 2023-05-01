@@ -1,21 +1,21 @@
+pub mod constants;
+pub mod data;
+pub mod events;
+pub mod utils;
+
 use near_sdk::{
     borsh::{self, BorshDeserialize, BorshSerialize},
     env,
     json_types::U128,
     near_bindgen, require,
     store::{UnorderedMap, Vector},
-    AccountId, Balance, BorshStorageKey, Promise,
+    AccountId, Balance, BorshStorageKey, Promise, ONE_NEAR,
 };
 use near_sdk_contract_tools::standard::nep297::Event;
 
 use constants::gas;
 use data::{Market, Offer, TokenInitArgs};
 use events::MarketplaceEvent;
-
-pub mod constants;
-pub mod data;
-pub mod events;
-pub mod utils;
 
 #[derive(BorshSerialize, BorshDeserialize, BorshStorageKey)]
 enum StorageKey {
@@ -88,11 +88,6 @@ impl Marketplace {
     // get all markets in the markeplace
     pub fn list_markets(&self) -> Vec<&Market> {
         self.markets.iter().collect()
-    }
-
-    // get the id that the next market would take
-    fn get_current_market_id(&self) -> u32 {
-        self.markets.len()
     }
 
     // get the min deposit for creating a market
@@ -260,24 +255,63 @@ impl Marketplace {
     // `create_offer` checks that attached deposit is sufficient before
     // parsing given offer metadata, and generate a new offer from it
     // !! offer owner == predecessor
+    // !! amount in NEAR
     #[payable]
     pub fn create_offer(&mut self, market: u32, is_long: bool, amount: U128) {
-        /*
-        - check deposit is sufficient
-        - create offer
-        - lock up NEAR
-        - increment offer id
-        */
-
+        require!(self.market_exists(market), "Market not found");
+        let attached_deposit = env::attached_deposit();
+        require!(
+            attached_deposit >= Balance::from(amount),
+            "Insufficient attached balance"
+        );
+        let offer_id = self.next_offer_id;
+        let account = env::predecessor_account_id();
+        let amount = U128::from(u128::from(amount) * ONE_NEAR);
+        let offer = Offer {
+            id: offer_id,
+            market,
+            is_long,
+            account: account.clone(),
+            amount,
+        };
+        self.offers.insert(offer_id, offer);
+        self.next_offer_id += 1;
         MarketplaceEvent::OfferCreated {}.emit();
-        todo!()
+        let refund = attached_deposit - Balance::from(amount);
+        if refund > 0 {
+            Promise::new(account).transfer(refund);
+        }
+    }
+
+    // `cancel_offer` checks that offer exists, then refunding the offered amount
+    // and removing the offer from the Marketplace
+    pub fn cancel_offer(&mut self, offer_id: u32) {
+        let offer = self.remove_offer(offer_id);
+        require!(
+            offer.account == env::predecessor_account_id(),
+            "Cannot cancel an offer you did not make"
+        );
+        Promise::new(env::predecessor_account_id()).transfer(Balance::from(offer.amount));
     }
 
     // `accept_offer` checks that offer is open, attached deposit is sufficient,
     // and predecessor does not own it before accepting the offer and removing it
     #[payable]
-    pub fn accept_offer(&mut self) {
+    pub fn accept_offer(&mut self, offer_id: u32) {
+        let offer = self.remove_offer(offer_id);
+        require!(
+            env::predecessor_account_id() != offer.account,
+            "Cannot accept an offer you made"
+        );
+        let attached_deposit = env::attached_deposit();
+        require!(
+            attached_deposit >= Balance::from(offer.amount),
+            "Insufficient attached balance"
+        );
         MarketplaceEvent::OfferAccepted {}.emit();
-        todo!()
+        let refund = attached_deposit - Balance::from(offer.amount);
+        if refund > 0 {
+            Promise::new(env::predecessor_account_id()).transfer(refund);
+        }
     }
 }
