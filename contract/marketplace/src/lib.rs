@@ -1,7 +1,7 @@
 pub mod constants;
 pub mod data;
 pub mod events;
-pub mod utils;
+pub mod helpers;
 
 use near_sdk::{
     borsh::{self, BorshDeserialize, BorshSerialize},
@@ -107,7 +107,7 @@ impl Marketplace {
 
     /// get the min deposit for creating a market
     pub fn get_create_market_min_deposit(&self) -> Balance {
-        utils::token_storage_stake() * 2 + self.market_storage_stake
+        helpers::token_storage_stake() * 2 + self.market_storage_stake
     }
 
     /// ---------- mutate methods ---------- ///
@@ -144,8 +144,9 @@ impl Marketplace {
             format!("M{}L", market_id),
         );
         let long_account_id =
-            utils::format_token_account_id(&long_args.metadata.symbol, marketplace.clone());
-        let long_promise = utils::format_deploy_token_promise(long_account_id.clone(), &long_args);
+            helpers::format_token_account_id(&long_args.metadata.symbol, marketplace.clone());
+        let long_promise =
+            helpers::format_deploy_token_promise(long_account_id.clone(), &long_args);
 
         // short token
         let short_args = TokenInitArgs::new(
@@ -154,9 +155,9 @@ impl Marketplace {
             format!("M{}S", market_id),
         );
         let short_account_id =
-            utils::format_token_account_id(&short_args.metadata.symbol, marketplace.clone());
+            helpers::format_token_account_id(&short_args.metadata.symbol, marketplace.clone());
         let short_promise =
-            utils::format_deploy_token_promise(short_account_id.clone(), &short_args);
+            helpers::format_deploy_token_promise(short_account_id.clone(), &short_args);
 
         // deploy tokens
         long_promise.and(short_promise).then(
