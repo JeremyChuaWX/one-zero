@@ -191,18 +191,19 @@ impl Marketplace {
                 market_owner.clone(),
                 long_token,
                 short_token,
-                description,
+                description.clone(),
             );
             self.markets.push(market);
             MarketplaceEvent::MarketCreated {
                 id: market_id,
-                description: description.clone(),
+                description,
             }
             .emit();
-            let refund = attached_deposit - self.get_create_market_min_deposit();
-            if refund > 0 {
-                Promise::new(market_owner).transfer(refund);
-            }
+            helpers::refund(
+                market_owner,
+                attached_deposit,
+                self.get_create_market_min_deposit(),
+            );
         } else {
             Promise::new(market_owner).transfer(attached_deposit);
         }
@@ -224,7 +225,7 @@ impl Marketplace {
         market.is_long = is_long;
         MarketplaceEvent::MarketClosed {
             id: market.id,
-            description: market.description,
+            description: market.description.clone(),
             is_long: market.is_long,
         }
         .emit();
@@ -313,10 +314,7 @@ impl Marketplace {
             is_long,
         }
         .emit();
-        let refund = attached_deposit - Balance::from(amount);
-        if refund > 0 {
-            Promise::new(account).transfer(refund);
-        }
+        helpers::refund(account, attached_deposit, Balance::from(amount));
     }
 
     /// `cancel_offer` checks that offer exists, then refunding the offered amount
@@ -335,10 +333,8 @@ impl Marketplace {
     #[payable]
     pub fn accept_offer(&mut self, offer_id: u32) {
         let offer = self.remove_offer(offer_id);
-        require!(
-            env::predecessor_account_id() != offer.account,
-            "Cannot accept an offer you made"
-        );
+        let account = env::predecessor_account_id();
+        require!(account != offer.account, "Cannot accept an offer you made");
         let attached_deposit = env::attached_deposit();
         require!(
             attached_deposit >= Balance::from(offer.amount),
@@ -351,9 +347,6 @@ impl Marketplace {
             is_long: offer.is_long,
         }
         .emit();
-        let refund = attached_deposit - Balance::from(offer.amount);
-        if refund > 0 {
-            Promise::new(env::predecessor_account_id()).transfer(refund);
-        }
+        helpers::refund(account, attached_deposit, Balance::from(offer.amount));
     }
 }
