@@ -48,12 +48,13 @@ impl Contract {
         log!("Account @{} burned {}", account_id, amount);
     }
 
-    #[payable]
-    pub fn ft_mint(&mut self, account: AccountId, amount: Balance) {
-        self.token.internal_register_account(&account);
-        self.token.internal_deposit(&account, amount);
+    pub fn ft_mint(&mut self, account: AccountId, amount: U128) {
+        if !self.token.accounts.contains_key(&account) {
+            self.token.internal_register_account(&account);
+        }
+        self.token.internal_deposit(&account, Balance::from(amount));
         log!(
-            "{} of {} minted for {}",
+            "{:?} of {} minted for {}",
             amount,
             self.metadata.get().unwrap().symbol,
             account,
