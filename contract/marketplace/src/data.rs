@@ -1,6 +1,10 @@
-use near_contract_standards::fungible_token::metadata::{FungibleTokenMetadata, FT_METADATA_SPEC};
+use near_contract_standards::fungible_token::{
+    core::FungibleTokenCore,
+    metadata::{FungibleTokenMetadata, FT_METADATA_SPEC},
+};
 use near_sdk::{
     borsh::{self, BorshDeserialize, BorshSerialize},
+    ext_contract,
     json_types::U128,
     serde::{Deserialize, Serialize},
     AccountId,
@@ -94,4 +98,11 @@ impl TokenInitArgs {
             },
         }
     }
+}
+
+#[ext_contract(ext_token)]
+pub trait TokenExt: FungibleTokenCore {
+    /// registers account
+    /// internal deposits the specified amount into account
+    fn ft_mint(&mut self, account: AccountId, amount: U128);
 }
