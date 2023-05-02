@@ -41,11 +41,23 @@ impl Contract {
     }
 
     fn on_account_closed(&mut self, account_id: AccountId, balance: Balance) {
-        log!(&format!("Closed @{} with {}", account_id, balance));
+        log!("Closed @{} with {}", account_id, balance);
     }
 
     fn on_tokens_burned(&mut self, account_id: AccountId, amount: Balance) {
-        log!(&format!("Account @{} burned {}", account_id, amount));
+        log!("Account @{} burned {}", account_id, amount);
+    }
+
+    #[payable]
+    pub fn ft_mint(&mut self, account: AccountId, amount: Balance) {
+        self.token.internal_register_account(&account);
+        self.token.internal_deposit(&account, amount);
+        log!(
+            "{} of {} minted for {}",
+            amount,
+            self.metadata.get().unwrap().symbol,
+            account,
+        );
     }
 }
 
