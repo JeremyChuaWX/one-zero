@@ -12,6 +12,4 @@ This contract creates markets and processes offers.
 
 ## Todo
 
-- [x] Event implementations
-- [ ] Storage management
-- [ ] FT resolver & receiver implementations
+- FT resolver & receiver implementations
