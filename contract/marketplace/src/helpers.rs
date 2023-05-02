@@ -32,9 +32,7 @@ pub fn format_deploy_token_promise(account_id: AccountId, args: &TokenInitArgs) 
 }
 
 /// transfers `(attached_deposit - amount)` to the specified account
-pub fn refund(account: AccountId, attached_deposit: Balance, amount: Balance) {
+pub fn refund(account: AccountId, attached_deposit: Balance, amount: Balance) -> Promise {
     let refund = attached_deposit - amount;
-    if refund > 0 {
-        Promise::new(account).transfer(refund);
-    }
+    Promise::new(account).transfer(refund)
 }
