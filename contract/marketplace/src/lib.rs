@@ -106,7 +106,7 @@ impl Marketplace {
     }
 
     /// get the min deposit for creating a market
-    /// deploy 2 tokens + stake for storing a market struct
+    /// deploy 2 tokens + store a market struct
     pub fn get_create_market_min_deposit(&self) -> Balance {
         helpers::token_storage_stake() * 2 + self.market_storage_stake
     }
