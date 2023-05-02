@@ -2,15 +2,14 @@ pub mod constants;
 pub mod data;
 pub mod events;
 pub mod helpers;
-pub mod storage_management;
 
 use near_sdk::{
     borsh::{self, BorshDeserialize, BorshSerialize},
     env,
     json_types::U128,
     near_bindgen, require,
-    store::{LookupMap, UnorderedMap, Vector},
-    AccountId, Balance, BorshStorageKey, Promise, ONE_NEAR,
+    store::{UnorderedMap, Vector},
+    AccountId, Balance, BorshStorageKey, Promise,
 };
 use near_sdk_contract_tools::standard::nep297::Event;
 
@@ -22,7 +21,6 @@ use events::MarketplaceEvent;
 enum StorageKey {
     Market,
     Offer,
-    StorageDeposit,
 }
 
 #[near_bindgen]
@@ -33,7 +31,6 @@ pub struct Marketplace {
     pub offers: UnorderedMap<u32, Offer>,
     pub market_storage_stake: Balance,
     pub offer_storage_stake: Balance,
-    pub storage_deposits: LookupMap<AccountId, Balance>,
 }
 
 impl Default for Marketplace {
@@ -71,7 +68,6 @@ impl Marketplace {
             offers: UnorderedMap::new(StorageKey::Offer),
             market_storage_stake: 0,
             offer_storage_stake: 0,
-            storage_deposits: LookupMap::new(StorageKey::StorageDeposit),
         };
         this.calculate_storage_stake();
         this
@@ -246,6 +242,12 @@ impl Marketplace {
 
     // public methods --------------------
 
+    /// get the min deposit for creating a offer
+    /// stake for storing a offer struct + offer amount
+    fn add_offer_storage_stake(&self, amount: Balance) -> Balance {
+        amount + self.offer_storage_stake
+    }
+
     /// get offer with given id
     pub fn get_offer(&self, offer_id: u32) -> &Offer {
         self.offers
@@ -289,18 +291,17 @@ impl Marketplace {
     /// `create_offer` checks that attached deposit is sufficient before
     /// parsing given offer metadata, and generate a new offer from it
     /// !! offer owner == predecessor
-    /// !! amount in NEAR
+    /// !! amount in yoctoNEAR
     #[payable]
     pub fn create_offer(&mut self, market: u32, is_long: bool, amount: U128) {
         require!(self.market_exists(market), "Market not found");
         let attached_deposit = env::attached_deposit();
         require!(
-            attached_deposit >= Balance::from(amount),
+            attached_deposit >= self.add_offer_storage_stake(Balance::from(amount)),
             "Insufficient attached balance"
         );
         let offer_id = self.next_offer_id;
         let account = env::predecessor_account_id();
-        let amount = U128::from(u128::from(amount) * ONE_NEAR);
         self.offers.insert(
             offer_id,
             Offer {
@@ -330,7 +331,8 @@ impl Marketplace {
             offer.account == env::predecessor_account_id(),
             "Cannot cancel an offer you did not make"
         );
-        Promise::new(env::predecessor_account_id()).transfer(Balance::from(offer.amount));
+        Promise::new(env::predecessor_account_id())
+            .transfer(self.add_offer_storage_stake(Balance::from(offer.amount)));
     }
 
     /// `accept_offer` checks that offer is open, attached deposit is sufficient,
@@ -352,6 +354,7 @@ impl Marketplace {
             is_long: offer.is_long,
         }
         .emit();
+        Promise::new(offer.account).transfer(self.offer_storage_stake); // refund storage stake
         helpers::refund(account, attached_deposit, Balance::from(offer.amount));
     }
 }
