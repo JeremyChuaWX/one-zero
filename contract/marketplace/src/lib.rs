@@ -293,14 +293,14 @@ impl Marketplace {
     /// !! amount in yoctoNEAR
     #[payable]
     pub fn create_offer(&mut self, market: u32, is_long: bool, amount: U128) {
-        require!(self.market_exists(market), "Market not found");
         let attached_deposit = env::attached_deposit();
+        let offer_id = self.next_offer_id;
+        let account = env::predecessor_account_id();
+        require!(self.market_exists(market), "Market not found");
         require!(
             attached_deposit >= self.add_offer_storage_stake(Balance::from(amount)),
             "Insufficient attached balance"
         );
-        let offer_id = self.next_offer_id;
-        let account = env::predecessor_account_id();
         self.offers.insert(
             offer_id,
             Offer {
@@ -340,8 +340,8 @@ impl Marketplace {
     pub fn accept_offer(&mut self, offer_id: u32) -> Promise {
         let offer = self.remove_offer(offer_id);
         let account = env::predecessor_account_id();
-        require!(account != offer.account, "Cannot accept an offer you made");
         let attached_deposit = env::attached_deposit();
+        require!(account != offer.account, "Cannot accept an offer you made");
         require!(
             attached_deposit >= Balance::from(offer.amount),
             "Insufficient attached balance"
