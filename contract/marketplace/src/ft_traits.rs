@@ -22,6 +22,7 @@ impl FungibleTokenReceiver for Marketplace {
 
 #[near_bindgen]
 impl FungibleTokenResolver for Marketplace {
+    #[private]
     fn ft_resolve_transfer(
         &mut self,
         sender_id: AccountId,
