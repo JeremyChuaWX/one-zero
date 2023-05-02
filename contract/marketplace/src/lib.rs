@@ -1,6 +1,7 @@
 pub mod constants;
 pub mod data;
 pub mod events;
+pub mod ft_traits;
 pub mod helpers;
 
 use near_sdk::{
