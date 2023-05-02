@@ -17,8 +17,6 @@ impl FungibleTokenReceiver for Marketplace {
         amount: U128,
         msg: String,
     ) -> PromiseOrValue<U128> {
-        // if winner, transfer amount * 2 to predecessor
-        // if loser, burn tokens
         let msg: FTReceiverMsg =
             serde_json::from_str(&msg).unwrap_or_else(|_| env::panic_str("Cannot parse message"));
         let market = self.get_market(msg.market_id);
@@ -51,10 +49,10 @@ impl FungibleTokenResolver for Marketplace {
     #[private]
     fn ft_resolve_transfer(
         &mut self,
-        sender_id: AccountId,
-        receiver_id: AccountId,
+        _sender_id: AccountId,
+        _receiver_id: AccountId,
         amount: U128,
     ) -> U128 {
-        todo!()
+        amount
     }
 }
