@@ -135,7 +135,7 @@ impl Marketplace {
         let attached_deposit = env::attached_deposit();
         require!(
             attached_deposit >= self.get_create_market_min_deposit(),
-            "Insufficient attached balance for storage stakes"
+            "Insufficient attached balance to create market"
         );
 
         // long token
@@ -242,7 +242,6 @@ impl Marketplace {
 
     // public methods --------------------
 
-    /// get the min deposit for creating a offer
     /// stake for storing a offer struct + offer amount
     fn add_offer_storage_stake(&self, amount: Balance) -> Balance {
         amount + self.offer_storage_stake
