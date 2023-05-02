@@ -53,12 +53,7 @@ impl Contract {
             self.token.internal_register_account(&account);
         }
         self.token.internal_deposit(&account, Balance::from(amount));
-        log!(
-            "{:?} of {} minted for {}",
-            amount,
-            self.metadata.get().unwrap().symbol,
-            account,
-        );
+        log!("{:?} minted for {}", amount, account);
     }
 }
 
