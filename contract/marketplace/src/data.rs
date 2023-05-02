@@ -111,5 +111,5 @@ pub trait TokenExt: FungibleTokenCore {
 #[serde(crate = "near_sdk::serde")]
 pub struct FTReceiverMsg {
     pub market_id: u32,
-    pub is_long: bool,
+    pub token_id: AccountId,
 }
