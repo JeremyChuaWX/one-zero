@@ -14,7 +14,7 @@ use near_sdk::{
 use near_sdk_contract_tools::standard::nep297::Event;
 
 use constants::gas;
-use data::{Market, Offer, TokenInitArgs};
+use data::{ext_token, Market, Offer, TokenInitArgs};
 use events::MarketplaceEvent;
 
 #[derive(BorshSerialize, BorshDeserialize, BorshStorageKey)]
@@ -337,7 +337,7 @@ impl Marketplace {
     /// `accept_offer` checks that offer is open, attached deposit is sufficient,
     /// and predecessor does not own it before accepting the offer and removing it
     #[payable]
-    pub fn accept_offer(&mut self, offer_id: u32) {
+    pub fn accept_offer(&mut self, offer_id: u32) -> Promise {
         let offer = self.remove_offer(offer_id);
         let account = env::predecessor_account_id();
         require!(account != offer.account, "Cannot accept an offer you made");
@@ -353,7 +353,42 @@ impl Marketplace {
             is_long: offer.is_long,
         }
         .emit();
-        Promise::new(offer.account).transfer(self.offer_storage_stake); // refund storage stake
-        helpers::refund(account, attached_deposit, Balance::from(offer.amount));
+        let refund_storage = Promise::new(offer.account.clone()).transfer(self.offer_storage_stake);
+        let refund_deposit = helpers::refund(
+            account.clone(),
+            attached_deposit,
+            Balance::from(offer.amount),
+        );
+        let (long_account, short_account) = if offer.is_long {
+            (offer.account, account)
+        } else {
+            (account, offer.account)
+        };
+        let market = self.get_market(offer.market);
+        refund_storage.and(refund_deposit).then(
+            Self::ext(env::current_account_id()).on_accpet_offer(
+                long_account,
+                short_account,
+                market.long_token.clone(),
+                market.short_token.clone(),
+                offer.amount,
+            ),
+        )
+    }
+
+    #[private]
+    pub fn on_accpet_offer(
+        &mut self,
+        long_account: AccountId,
+        short_account: AccountId,
+        market_long_token: AccountId,
+        market_short_token: AccountId,
+        amount: U128,
+    ) {
+        if env::promise_results_count() == 2 {
+            let mint_long = ext_token::ext(market_long_token).ft_mint(long_account, amount);
+            let mint_short = ext_token::ext(market_short_token).ft_mint(short_account, amount);
+            mint_long.and(mint_short);
+        }
     }
 }
