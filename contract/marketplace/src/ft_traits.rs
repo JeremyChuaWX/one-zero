@@ -1,7 +1,7 @@
 use near_contract_standards::fungible_token::{
     receiver::FungibleTokenReceiver, resolver::FungibleTokenResolver,
 };
-use near_sdk::near_bindgen;
+use near_sdk::{json_types::U128, near_bindgen, AccountId, PromiseOrValue};
 
 use crate::{Marketplace, MarketplaceExt};
 
@@ -9,10 +9,13 @@ use crate::{Marketplace, MarketplaceExt};
 impl FungibleTokenReceiver for Marketplace {
     fn ft_on_transfer(
         &mut self,
-        sender_id: near_sdk::AccountId,
-        amount: near_sdk::json_types::U128,
+        sender_id: AccountId,
+        amount: U128,
         msg: String,
-    ) -> near_sdk::PromiseOrValue<near_sdk::json_types::U128> {
+    ) -> PromiseOrValue<U128> {
+        // msg = (market, is_long)
+        // if winner, transfer amount * 2 to predecessor
+        // if loser, burn tokens
         todo!()
     }
 }
@@ -21,10 +24,10 @@ impl FungibleTokenReceiver for Marketplace {
 impl FungibleTokenResolver for Marketplace {
     fn ft_resolve_transfer(
         &mut self,
-        sender_id: near_sdk::AccountId,
-        receiver_id: near_sdk::AccountId,
-        amount: near_sdk::json_types::U128,
-    ) -> near_sdk::json_types::U128 {
+        sender_id: AccountId,
+        receiver_id: AccountId,
+        amount: U128,
+    ) -> U128 {
         todo!()
     }
 }
