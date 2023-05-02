@@ -7,8 +7,8 @@ pub fn token_storage_stake() -> Balance {
     (TOKEN_BYTES.to_vec().len() as u128 + EXTRA_BYTES) * env::storage_byte_cost()
 }
 
-pub fn format_token_account_id(symbol: &str, owner: AccountId) -> AccountId {
-    let token_account_id: AccountId = format!("{}.{}", symbol.to_ascii_lowercase(), owner)
+pub fn format_token_account_id(symbol: &str, owner_id: AccountId) -> AccountId {
+    let token_account_id: AccountId = format!("{}.{}", symbol.to_ascii_lowercase(), owner_id)
         .parse()
         .unwrap_or_else(|_| env::panic_str("Cannot parse token account id"));
     require!(
@@ -32,7 +32,7 @@ pub fn format_deploy_token_promise(account_id: AccountId, args: &TokenInitArgs) 
 }
 
 /// transfers `(attached_deposit - amount)` to the specified account
-pub fn refund(account: AccountId, attached_deposit: Balance, amount: Balance) -> Promise {
+pub fn refund(account_id: AccountId, attached_deposit: Balance, amount: Balance) -> Promise {
     let refund = attached_deposit - amount;
-    Promise::new(account).transfer(refund)
+    Promise::new(account_id).transfer(refund)
 }
