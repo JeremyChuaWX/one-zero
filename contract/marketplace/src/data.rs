@@ -16,27 +16,27 @@ pub struct Market {
     pub id: u32,
     pub is_closed: bool,
     pub is_long: bool,
-    pub owner: AccountId,
-    pub long_token: AccountId,
-    pub short_token: AccountId,
+    pub owner_id: AccountId,
+    pub long_token_id: AccountId,
+    pub short_token_id: AccountId,
     pub description: String,
 }
 
 impl Market {
     pub fn new(
         id: u32,
-        owner: AccountId,
-        long_token: AccountId,
-        short_token: AccountId,
+        owner_id: AccountId,
+        long_token_id: AccountId,
+        short_token_id: AccountId,
         description: String,
     ) -> Self {
         Self {
             id,
             is_closed: false,
             is_long: false,
-            owner,
-            long_token,
-            short_token,
+            owner_id,
+            long_token_id,
+            short_token_id,
             description,
         }
     }
@@ -46,9 +46,9 @@ impl Market {
             id: 0,
             is_closed: false,
             is_long: false,
-            owner: "test".parse().unwrap(),
-            long_token: "test".parse().unwrap(),
-            short_token: "test".parse().unwrap(),
+            owner_id: "test".parse().unwrap(),
+            long_token_id: "test".parse().unwrap(),
+            short_token_id: "test".parse().unwrap(),
             description: "test".to_string(),
         }
     }
@@ -58,9 +58,9 @@ impl Market {
 #[serde(crate = "near_sdk::serde")]
 pub struct Offer {
     pub id: u32,
-    pub market: u32,
+    pub market_id: u32,
     pub is_long: bool,
-    pub account: AccountId,
+    pub account_id: AccountId,
     pub amount: U128,
 }
 
@@ -68,9 +68,9 @@ impl Offer {
     pub fn dummy() -> Self {
         Self {
             id: 0,
-            market: 0,
+            market_id: 0,
             is_long: false,
-            account: "test".parse().unwrap(),
+            account_id: "test".parse().unwrap(),
             amount: U128::from(123),
         }
     }
@@ -79,14 +79,14 @@ impl Offer {
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(crate = "near_sdk::serde")]
 pub struct TokenInitArgs {
-    pub owner: AccountId,
+    pub owner_id: AccountId,
     pub metadata: FungibleTokenMetadata,
 }
 
 impl TokenInitArgs {
     pub fn new(owner: AccountId, name: String, symbol: String) -> Self {
         Self {
-            owner,
+            owner_id: owner,
             metadata: FungibleTokenMetadata {
                 spec: FT_METADATA_SPEC.to_string(),
                 name,
@@ -105,4 +105,11 @@ pub trait TokenExt: FungibleTokenCore {
     /// registers account
     /// internal deposits the specified amount into account
     fn ft_mint(&mut self, account: AccountId, amount: U128);
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(crate = "near_sdk::serde")]
+pub struct FTReceiverMsg {
+    pub market_id: u32,
+    pub is_long: bool,
 }

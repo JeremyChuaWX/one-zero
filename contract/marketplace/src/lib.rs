@@ -131,8 +131,8 @@ impl Marketplace {
     #[payable]
     pub fn create_market(&mut self, description: String) -> Promise {
         let market_id = self.get_current_market_id();
-        let market_owner = env::predecessor_account_id();
-        let marketplace = env::current_account_id();
+        let market_owner_id = env::predecessor_account_id();
+        let marketplace_id = env::current_account_id();
         let attached_deposit = env::attached_deposit();
         require!(
             attached_deposit >= self.get_create_market_min_deposit(),
@@ -146,7 +146,7 @@ impl Marketplace {
             format!("M{}L", market_id),
         );
         let long_account_id =
-            helpers::format_token_account_id(&long_args.metadata.symbol, marketplace.clone());
+            helpers::format_token_account_id(&long_args.metadata.symbol, marketplace_id.clone());
         let long_promise =
             helpers::format_deploy_token_promise(long_account_id.clone(), &long_args);
 
@@ -157,17 +157,17 @@ impl Marketplace {
             format!("M{}S", market_id),
         );
         let short_account_id =
-            helpers::format_token_account_id(&short_args.metadata.symbol, marketplace.clone());
+            helpers::format_token_account_id(&short_args.metadata.symbol, marketplace_id.clone());
         let short_promise =
             helpers::format_deploy_token_promise(short_account_id.clone(), &short_args);
 
         // deploy tokens
         long_promise.and(short_promise).then(
-            Self::ext(marketplace)
+            Self::ext(marketplace_id)
                 .with_static_gas(gas::CREATE_MARKET)
                 .on_create_market(
                     market_id,
-                    market_owner,
+                    market_owner_id,
                     long_account_id,
                     short_account_id,
                     description,
@@ -181,18 +181,18 @@ impl Marketplace {
     pub fn on_create_market(
         &mut self,
         market_id: u32,
-        market_owner: AccountId,
-        long_token: AccountId,
-        short_token: AccountId,
+        market_owner_id: AccountId,
+        long_token_id: AccountId,
+        short_token_id: AccountId,
         description: String,
         attached_deposit: Balance,
     ) {
         if env::promise_results_count() == 2 {
             let market = Market::new(
                 market_id,
-                market_owner.clone(),
-                long_token,
-                short_token,
+                market_owner_id.clone(),
+                long_token_id,
+                short_token_id,
                 description.clone(),
             );
             self.markets.push(market);
@@ -202,12 +202,12 @@ impl Marketplace {
             }
             .emit();
             helpers::refund(
-                market_owner,
+                market_owner_id,
                 attached_deposit,
                 self.get_create_market_min_deposit(),
             );
         } else {
-            Promise::new(market_owner).transfer(attached_deposit);
+            Promise::new(market_owner_id).transfer(attached_deposit);
         }
     }
 
@@ -220,7 +220,7 @@ impl Marketplace {
             "Cannot close a market that is already closed"
         );
         require!(
-            market.owner == env::predecessor_account_id(),
+            market.owner_id == env::predecessor_account_id(),
             "Cannot close a market that you do not own"
         );
         market.is_closed = true;
@@ -261,11 +261,11 @@ impl Marketplace {
     }
 
     /// get all offers in a given market
-    pub fn list_offers_by_market(&self, market: u32) -> Vec<&Offer> {
+    pub fn list_offers_by_market(&self, market_id: u32) -> Vec<&Offer> {
         self.offers
             .iter()
             .filter_map(|(_id, offer)| {
-                if offer.market == market {
+                if offer.market_id == market_id {
                     Some(offer)
                 } else {
                     None
@@ -293,11 +293,11 @@ impl Marketplace {
     /// !! offer owner == predecessor
     /// !! amount in yoctoNEAR
     #[payable]
-    pub fn create_offer(&mut self, market: u32, is_long: bool, amount: U128) {
+    pub fn create_offer(&mut self, market_id: u32, is_long: bool, amount: U128) {
         let attached_deposit = env::attached_deposit();
         let offer_id = self.next_offer_id;
         let account = env::predecessor_account_id();
-        require!(self.market_exists(market), "Market not found");
+        require!(self.market_exists(market_id), "Market not found");
         require!(
             attached_deposit >= self.add_offer_storage_stake(Balance::from(amount)),
             "Insufficient attached balance"
@@ -306,16 +306,16 @@ impl Marketplace {
             offer_id,
             Offer {
                 id: offer_id,
-                market,
+                market_id,
                 is_long,
-                account: account.clone(),
+                account_id: account.clone(),
                 amount,
             },
         );
         self.next_offer_id += 1;
         MarketplaceEvent::OfferCreated {
             id: offer_id,
-            market,
+            market_id,
             amount,
             is_long,
         }
@@ -328,7 +328,7 @@ impl Marketplace {
     pub fn cancel_offer(&mut self, offer_id: u32) {
         let offer = self.remove_offer(offer_id);
         require!(
-            offer.account == env::predecessor_account_id(),
+            offer.account_id == env::predecessor_account_id(),
             "Cannot cancel an offer you did not make"
         );
         Promise::new(env::predecessor_account_id())
@@ -340,38 +340,42 @@ impl Marketplace {
     #[payable]
     pub fn accept_offer(&mut self, offer_id: u32) -> Promise {
         let offer = self.remove_offer(offer_id);
-        let account = env::predecessor_account_id();
+        let account_id = env::predecessor_account_id();
         let attached_deposit = env::attached_deposit();
-        require!(account != offer.account, "Cannot accept an offer you made");
+        require!(
+            account_id != offer.account_id,
+            "Cannot accept an offer you made"
+        );
         require!(
             attached_deposit >= Balance::from(offer.amount),
             "Insufficient attached balance"
         );
         MarketplaceEvent::OfferAccepted {
             id: offer.id,
-            market: offer.market,
+            market_id: offer.market_id,
             amount: offer.amount,
             is_long: offer.is_long,
         }
         .emit();
-        let refund_storage = Promise::new(offer.account.clone()).transfer(self.offer_storage_stake);
+        let refund_storage =
+            Promise::new(offer.account_id.clone()).transfer(self.offer_storage_stake);
         let refund_deposit = helpers::refund(
-            account.clone(),
+            account_id.clone(),
             attached_deposit,
             Balance::from(offer.amount),
         );
-        let (long_account, short_account) = if offer.is_long {
-            (offer.account, account)
+        let (long_account_id, short_account_id) = if offer.is_long {
+            (offer.account_id, account_id)
         } else {
-            (account, offer.account)
+            (account_id, offer.account_id)
         };
-        let market = self.get_market(offer.market);
+        let market = self.get_market(offer.market_id);
         refund_storage.and(refund_deposit).then(
             Self::ext(env::current_account_id()).on_accpet_offer(
-                long_account,
-                short_account,
-                market.long_token.clone(),
-                market.short_token.clone(),
+                long_account_id,
+                short_account_id,
+                market.long_token_id.clone(),
+                market.short_token_id.clone(),
                 offer.amount,
             ),
         )
@@ -380,15 +384,16 @@ impl Marketplace {
     #[private]
     pub fn on_accpet_offer(
         &mut self,
-        long_account: AccountId,
-        short_account: AccountId,
-        market_long_token: AccountId,
-        market_short_token: AccountId,
+        long_account_id: AccountId,
+        short_account_id: AccountId,
+        market_long_token_id: AccountId,
+        market_short_token_id: AccountId,
         amount: U128,
     ) {
         if env::promise_results_count() == 2 {
-            let mint_long = ext_token::ext(market_long_token).ft_mint(long_account, amount);
-            let mint_short = ext_token::ext(market_short_token).ft_mint(short_account, amount);
+            let mint_long = ext_token::ext(market_long_token_id).ft_mint(long_account_id, amount);
+            let mint_short =
+                ext_token::ext(market_short_token_id).ft_mint(short_account_id, amount);
             mint_long.and(mint_short);
         }
     }

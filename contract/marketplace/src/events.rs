@@ -21,13 +21,13 @@ pub enum MarketplaceEvent {
     // ---------- offer events ---------- //
     OfferCreated {
         id: u32,
-        market: u32,
+        market_id: u32,
         amount: U128,
         is_long: bool,
     },
     OfferAccepted {
         id: u32,
-        market: u32,
+        market_id: u32,
         amount: U128,
         is_long: bool,
     },

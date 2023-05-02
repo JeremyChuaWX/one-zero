@@ -29,14 +29,14 @@ pub struct Contract {
 #[near_bindgen]
 impl Contract {
     #[init]
-    pub fn new(owner: AccountId, metadata: FungibleTokenMetadata) -> Self {
+    pub fn new(owner_id: AccountId, metadata: FungibleTokenMetadata) -> Self {
         assert!(!env::state_exists(), "Already initialised");
         metadata.assert_valid();
         let mut this = Self {
             token: FungibleToken::new(StorageKey::Token),
             metadata: LazyOption::new(StorageKey::Metadata, Some(&metadata)),
         };
-        this.token.internal_register_account(&owner);
+        this.token.internal_register_account(&owner_id);
         this
     }
 
