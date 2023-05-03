@@ -35,11 +35,9 @@ impl FungibleTokenReceiver for Marketplace {
                 Promise::new(sender_id.clone())
                     .transfer(Balance::from(amount) * 2)
                     .then(
-                        ext_ft_resolver::ext(env::current_account_id()).ft_resolve_transfer(
-                            sender_id,
-                            env::current_account_id(),
-                            amount,
-                        ),
+                        ext_ft_resolver::ext(env::current_account_id())
+                            .with_static_gas(gas::FT_RESOLVE)
+                            .ft_resolve_transfer(sender_id, env::current_account_id(), amount),
                     ),
             )
         } else {

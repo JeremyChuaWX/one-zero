@@ -8,4 +8,5 @@ pub mod gas {
 
     pub const INIT_TOKEN: Gas = Gas(5_000_000_000_000);
     pub const CREATE_MARKET: Gas = Gas(5_000_000_000_000);
+    pub const FT_RESOLVE: Gas = Gas(5_000_000_000_000);
 }
