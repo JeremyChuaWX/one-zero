@@ -106,6 +106,11 @@ impl Marketplace {
         self.markets.iter().collect()
     }
 
+    /// get the market storage stake
+    pub fn get_market_storage_stake(&self) -> Balance {
+        self.market_storage_stake
+    }
+
     /// get the min deposit for creating a market
     /// deploy 2 tokens + store a market struct
     pub fn get_create_market_min_deposit(&self) -> Balance {
@@ -243,6 +248,10 @@ impl Marketplace {
 
     // public methods --------------------
 
+    /// get the market storage stake
+    pub fn get_offer_storage_stake(&self) -> Balance {
+        self.offer_storage_stake
+    }
     /// stake for storing a offer struct + offer amount
     fn add_offer_storage_stake(&self, amount: Balance) -> Balance {
         amount + self.offer_storage_stake
