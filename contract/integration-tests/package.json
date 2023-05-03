@@ -1,4 +1,7 @@
 {
+    "scripts": {
+        "test": "ava --verbose"
+    },
     "devDependencies": {
         "@types/bn.js": "^5.1.1",
         "ava": "^5.2.0",
