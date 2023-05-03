@@ -46,10 +46,10 @@ impl Market {
             id: 0,
             is_closed: false,
             is_long: false,
-            owner_id: "test".parse().unwrap(),
-            long_token_id: "test".parse().unwrap(),
-            short_token_id: "test".parse().unwrap(),
-            description: "test".to_string(),
+            owner_id: "one-zero.testnet".parse().unwrap(),
+            long_token_id: "one-zero.testnet".parse().unwrap(),
+            short_token_id: "one-zero.testnet".parse().unwrap(),
+            description: "one-zero.testnet".to_string(),
         }
     }
 }
@@ -70,7 +70,7 @@ impl Offer {
             id: 0,
             market_id: 0,
             is_long: false,
-            account_id: "test".parse().unwrap(),
+            account_id: "one-zero.testnet".parse().unwrap(),
             amount: U128::from(123),
         }
     }
