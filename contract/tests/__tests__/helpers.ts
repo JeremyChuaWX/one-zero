@@ -1,8 +1,8 @@
-import { NearAccount, parseNEAR, tGas } from "near-workspaces";
+import { NearAccount, parse, Worker } from "near-workspaces";
 
-const MAX_GAS = tGas(300);
+export const MAX_GAS = parse("300 Tgas");
 
-type Market = {
+export type Market = {
     id: number;
     owner_id: string;
     description: string;
@@ -12,7 +12,7 @@ type Market = {
     short_token_id: string;
 };
 
-type Offer = {
+export type Offer = {
     id: number;
     market_id: number;
     account_id: string;
@@ -20,19 +20,19 @@ type Offer = {
     amount: string;
 };
 
-function numberToNEAR(n: number): string {
-    return parseNEAR(`${n} N`).toString();
+export function nearNumberToString(n: number): string {
+    return parse(`${n} N`).toString();
 }
 
-async function listMarkets(marketplace: NearAccount): Promise<Market[]> {
+export async function listMarkets(marketplace: NearAccount): Promise<Market[]> {
     return await marketplace.view("list_markets");
 }
 
-async function listOffers(marketplace: NearAccount): Promise<Offer[]> {
+export async function listOffers(marketplace: NearAccount): Promise<Offer[]> {
     return await marketplace.view("list_offers");
 }
 
-async function createMarket(
+export async function createMarket(
     marketplace: NearAccount,
     marketOwner: NearAccount,
     description: string,
@@ -41,14 +41,28 @@ async function createMarket(
         marketplace,
         "create_market",
         { description },
-        { attachedDeposit: numberToNEAR(5), gas: MAX_GAS },
+        { attachedDeposit: nearNumberToString(5), gas: MAX_GAS },
     );
 }
 
-async function createOffer(
+export async function closeMarket(
+    marketplace: NearAccount,
+    marketOwner: NearAccount,
+    marketId: number,
+    isLong: boolean,
+) {
+    await marketOwner.call(
+        marketplace,
+        "close_market",
+        { market_id: marketId, is_long: isLong },
+        { gas: MAX_GAS },
+    );
+}
+
+export async function createOffer(
     marketplace: NearAccount,
     offerMaker: NearAccount,
-    market_id: number,
+    marketId: number,
     isLong: boolean,
     amount: number,
 ) {
@@ -56,23 +70,33 @@ async function createOffer(
         marketplace,
         "create_offer",
         {
-            market_id,
+            market_id: marketId,
             is_long: isLong,
-            amount: numberToNEAR(amount),
+            amount: nearNumberToString(amount),
         },
-        {
-            attachedDeposit: numberToNEAR(amount + 1),
-            gas: MAX_GAS,
-        },
+        { attachedDeposit: nearNumberToString(amount + 1), gas: MAX_GAS },
     );
 }
 
-export {
-    Market,
-    Offer,
-    numberToNEAR,
-    listMarkets,
-    listOffers,
-    createMarket,
-    createOffer,
-};
+export async function acceptOffer(
+    marketplace: NearAccount,
+    offerAccepter: NearAccount,
+    offerId: number,
+) {
+    await offerAccepter.call(
+        marketplace,
+        "accept_offer",
+        { offer_id: offerId },
+        { attachedDeposit: nearNumberToString(4), gas: MAX_GAS },
+    );
+}
+
+export async function getTokenBalance(
+    token: string,
+    account: NearAccount,
+    worker: Worker | undefined,
+) {
+    if (worker === undefined) throw Error("Worker undefined");
+    const tokenAccount = worker.rootAccount.getAccount(token);
+    return tokenAccount.view("ft_balance_of", { account_id: account });
+}
