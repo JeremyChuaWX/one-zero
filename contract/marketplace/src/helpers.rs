@@ -1,7 +1,9 @@
 use near_sdk::{env, require, serde_json, AccountId, Balance, Promise};
 
-use crate::constants::{gas, EXTRA_BYTES, TOKEN_BYTES, ZERO};
-use crate::data::TokenInitArgs;
+use crate::{
+    constants::{gas, EXTRA_BYTES, TOKEN_BYTES, ZERO},
+    data::TokenInitArgs,
+};
 
 pub fn token_storage_stake() -> Balance {
     (TOKEN_BYTES.to_vec().len() as u128 + EXTRA_BYTES) * env::storage_byte_cost()

@@ -7,7 +7,11 @@ use near_sdk::{
     PromiseOrValue,
 };
 
-use crate::{constants::ZERO, data::FTReceiverMsg, Marketplace, MarketplaceExt};
+use crate::{
+    constants::{gas, ZERO},
+    data::FTReceiverMsg,
+    Marketplace, MarketplaceExt,
+};
 
 #[near_bindgen]
 impl FungibleTokenReceiver for Marketplace {
