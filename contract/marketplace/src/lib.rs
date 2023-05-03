@@ -349,8 +349,10 @@ impl Marketplace {
     #[payable]
     pub fn accept_offer(&mut self, offer_id: u32) -> Promise {
         let offer = self.remove_offer(offer_id);
+        let market = self.get_market(offer.market_id);
         let account_id = env::predecessor_account_id();
         let attached_deposit = env::attached_deposit();
+        require!(market.is_closed, "Cannot accept an offer on an open market");
         require!(
             account_id != offer.account_id,
             "Cannot accept an offer you made"
@@ -378,7 +380,6 @@ impl Marketplace {
         } else {
             (account_id, offer.account_id)
         };
-        let market = self.get_market(offer.market_id);
         refund_storage.and(refund_deposit).then(
             Self::ext(env::current_account_id()).on_accpet_offer(
                 long_account_id,
