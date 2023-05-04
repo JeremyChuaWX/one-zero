@@ -10,7 +10,11 @@ const AuthButton = () => {
     };
 
     if (accountId) {
-        return <div>Signed in as {accountId}</div>;
+        return (
+            <div className="py-1 px-4 text-gray-200 bg-gray-900 rounded-md">
+                {accountId}
+            </div>
+        );
     } else {
         return (
             <button
@@ -26,7 +30,7 @@ const AuthButton = () => {
 const Navbar = () => {
     return (
         <div className="flex justify-between items-center p-4 w-full">
-            <p className="text-2xl font-bold text-gray-900">One Zero</p>
+            <p className="text-2xl font-bold">One Zero</p>
             <div className="flex gap-4 items-center">
                 <p>Markets</p>
                 <p>Offers</p>
