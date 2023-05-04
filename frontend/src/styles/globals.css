@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body,
+#__next {
+    @apply h-screen w-screen bg-gray-200 text-gray-900;
+}
