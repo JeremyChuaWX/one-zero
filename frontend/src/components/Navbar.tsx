@@ -9,22 +9,14 @@ const AuthButton = () => {
         modal.show();
     };
 
-    if (accountId) {
-        return (
-            <div className="py-1 px-4 text-gray-200 bg-gray-900 rounded-md">
-                {accountId}
-            </div>
-        );
-    } else {
-        return (
-            <button
-                className="py-1 px-4 text-gray-200 bg-gray-900 rounded-md"
-                onClick={signInOnClick}
-            >
-                Sign In
-            </button>
-        );
-    }
+    return (
+        <button
+            className="py-1 px-4 text-gray-200 bg-gray-900 rounded-md"
+            onClick={signInOnClick}
+        >
+            {accountId ?? "Sign In"}
+        </button>
+    );
 };
 
 const Navbar = () => {
