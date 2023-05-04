@@ -9,7 +9,3 @@ This is the FT contract for each arm (long/short) of a market.
 ### Marketplace
 
 This contract creates markets and processes offers.
-
-## Todo
-
-- FT resolver & receiver implementations
