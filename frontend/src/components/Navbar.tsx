@@ -1,5 +1,5 @@
 import { MouseEventHandler } from "react";
-import { useWalletSelector } from "~/context/WalletSelectorContext";
+import { useWalletSelector } from "~/contexts/WalletSelectorContext";
 
 const AuthButton = () => {
     const { modal, accountId } = useWalletSelector();

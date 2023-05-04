@@ -1,7 +1,7 @@
 import Head from "next/head";
 import { type AppType } from "next/dist/shared/lib/utils";
 import Navbar from "~/components/Navbar";
-import { WalletSelectorContextProvider } from "~/context/WalletSelectorContext";
+import { WalletSelectorContextProvider } from "~/contexts/WalletSelectorContext";
 
 import "~/styles/globals.css";
 
