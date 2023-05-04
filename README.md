@@ -9,13 +9,13 @@ Install all dependencies before starting (check all `Cargo.toml` and `package.js
 Make the directory for wasm files to be copied to after building.
 
 ```sh
-mkdir ./contracts/tests/wasm
+mkdir ./contract/tests/wasm
 ```
 
-Run the dev deploy script with root directory as `./contracts` to build the contracts (might need to build twice as marketplace includes bytes of token).
+Run the dev deploy script with root directory as `./contract` to build the contracts (might need to build twice as marketplace includes bytes of token).
 
 ```sh
-cd contracts
+cd contract
 make dev-deploy
 ```
 
@@ -24,7 +24,7 @@ make dev-deploy
 Cd into the tests directory.
 
 ```sh
-cd ./contracts/tests
+cd ./contract/tests
 ```
 
 Run the test script.
