@@ -4,6 +4,7 @@ import Navbar from "~/components/Navbar";
 import { WalletSelectorContextProvider } from "~/contexts/WalletSelectorContext";
 
 import "~/styles/globals.css";
+import "@near-wallet-selector/modal-ui/styles.css";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
     return (
@@ -13,7 +14,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
             </Head>
             <WalletSelectorContextProvider>
                 <Navbar />
-                <main className="p-4 w-full h-full text-gray-900 bg-gray-200">
+                <main className="p-4 w-full h-full">
                     <Component {...pageProps} />
                 </main>
             </WalletSelectorContextProvider>

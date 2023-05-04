@@ -23,7 +23,7 @@ const Home: NextPage = () => {
                 <button type="submit">Add Market</button>
             </form>
             {markets.map((market) => {
-                <div>
+                <div key={market.id}>
                     {market.id}: {market.description}
                 </div>;
             })}
