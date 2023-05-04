@@ -19,8 +19,7 @@
         "react": "18.2.0",
         "react-dom": "18.2.0",
         "rxjs": "^7.8.1",
-        "zod": "^3.21.4",
-        "zustand": "^4.3.7"
+        "zod": "^3.21.4"
     },
     "devDependencies": {
         "@types/eslint": "^8.21.3",
