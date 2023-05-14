@@ -14,14 +14,11 @@ const MARKETPLACE_CONTRACT_PATH = "./wasm/marketplace.wasm";
 const MARKET_DESCRIPTION = "testing";
 
 type Context = {
-    worker?: Worker;
+    worker: Worker;
     accounts: Record<string, NearAccount>;
 };
 
-let context: Context = {
-    worker: undefined,
-    accounts: {},
-};
+let context: Context;
 
 beforeAll(async () => {
     const worker = await Worker.init();
@@ -180,7 +177,7 @@ describe("Accept offer", () => {
 });
 
 afterAll(async () => {
-    await context.worker?.tearDown().catch((err) => {
+    await context.worker.tearDown().catch((err) => {
         console.log("Failed to tear down the worker:", err);
     });
 });
