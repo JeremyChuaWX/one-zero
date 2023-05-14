@@ -82,11 +82,6 @@ impl Marketplace {
 
     // internal methods --------------------
 
-    /// check if market exists
-    fn market_exists(&self, market_id: u32) -> bool {
-        self.markets.get(market_id).is_some()
-    }
-
     /// get the id that the next market would take
     fn get_current_market_id(&self) -> u32 {
         self.markets.len()
@@ -306,7 +301,11 @@ impl Marketplace {
         let attached_deposit = env::attached_deposit();
         let offer_id = self.next_offer_id;
         let account = env::predecessor_account_id();
-        require!(self.market_exists(market_id), "Market not found");
+        let market = self.get_market(market_id);
+        require!(
+            !market.is_closed,
+            "Cannot create an offer on a closed market"
+        );
         require!(
             attached_deposit >= self.add_offer_storage_stake(Balance::from(amount)),
             "Insufficient attached balance"
@@ -352,7 +351,10 @@ impl Marketplace {
         let market = self.get_market(offer.market_id);
         let account_id = env::predecessor_account_id();
         let attached_deposit = env::attached_deposit();
-        require!(market.is_closed, "Cannot accept an offer on an open market");
+        require!(
+            !market.is_closed,
+            "Cannot accept an offer on a closed market"
+        );
         require!(
             account_id != offer.account_id,
             "Cannot accept an offer you made"
