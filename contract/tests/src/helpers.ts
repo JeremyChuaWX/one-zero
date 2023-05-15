@@ -110,6 +110,23 @@ export async function acceptOffer({
     );
 }
 
+export async function cancelOffer({
+    marketplace,
+    offerMaker,
+    offerId,
+}: {
+    marketplace: NearAccount;
+    offerMaker: NearAccount;
+    offerId: number;
+}) {
+    await offerMaker.call(
+        marketplace,
+        "cancel_offer",
+        { offer_id: offerId },
+        { gas: MAX_GAS },
+    );
+}
+
 export async function getTokenBalance({
     token,
     account,
@@ -121,4 +138,28 @@ export async function getTokenBalance({
 }) {
     const tokenAccount = worker.rootAccount.getAccount(token);
     return tokenAccount.view("ft_balance_of", { account_id: account });
+}
+
+export async function getRewards({
+    token,
+    marketId,
+    account,
+    marketplace,
+    amount,
+}: {
+    token: string;
+    marketId: number;
+    account: NearAccount;
+    marketplace: NearAccount;
+    amount: number;
+}) {
+    const msg = {
+        market_id: marketId,
+        token_id: token,
+    };
+    account.call(token, "ft_transfer_call", {
+        receiver_id: marketplace,
+        amount: nearNumberToString(amount),
+        msg: JSON.stringify(msg),
+    });
 }
