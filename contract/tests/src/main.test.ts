@@ -25,7 +25,7 @@ let context: Context;
 beforeAll(async () => {
     const worker = await Worker.init();
     const root = worker.rootAccount;
-    const marketOwner = await root.createSubAccount("offer");
+    const marketOwner = await root.createSubAccount("owner");
     const longAccount = await root.createSubAccount("long");
     const shortAccount = await root.createSubAccount("short");
     const marketplace = await root.devDeploy(MARKETPLACE_CONTRACT_PATH);
