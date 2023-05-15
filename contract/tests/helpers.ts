@@ -32,11 +32,15 @@ export async function listOffers(marketplace: NearAccount): Promise<Offer[]> {
     return await marketplace.view("list_offers");
 }
 
-export async function createMarket(
-    marketplace: NearAccount,
-    marketOwner: NearAccount,
-    description: string,
-) {
+export async function createMarket({
+    marketplace,
+    marketOwner,
+    description,
+}: {
+    marketplace: NearAccount;
+    marketOwner: NearAccount;
+    description: string;
+}) {
     await marketOwner.call(
         marketplace,
         "create_market",
@@ -45,12 +49,17 @@ export async function createMarket(
     );
 }
 
-export async function closeMarket(
-    marketplace: NearAccount,
-    marketOwner: NearAccount,
-    marketId: number,
-    isLong: boolean,
-) {
+export async function closeMarket({
+    marketplace,
+    marketOwner,
+    marketId,
+    isLong,
+}: {
+    marketplace: NearAccount;
+    marketOwner: NearAccount;
+    marketId: number;
+    isLong: boolean;
+}) {
     await marketOwner.call(
         marketplace,
         "close_market",
@@ -59,13 +68,19 @@ export async function closeMarket(
     );
 }
 
-export async function createOffer(
-    marketplace: NearAccount,
-    offerMaker: NearAccount,
-    marketId: number,
-    isLong: boolean,
-    amount: number,
-) {
+export async function createOffer({
+    marketplace,
+    offerMaker,
+    marketId,
+    isLong,
+    amount,
+}: {
+    marketplace: NearAccount;
+    offerMaker: NearAccount;
+    marketId: number;
+    isLong: boolean;
+    amount: number;
+}) {
     await offerMaker.call(
         marketplace,
         "create_offer",
@@ -78,11 +93,15 @@ export async function createOffer(
     );
 }
 
-export async function acceptOffer(
-    marketplace: NearAccount,
-    offerAccepter: NearAccount,
-    offerId: number,
-) {
+export async function acceptOffer({
+    marketplace,
+    offerAccepter,
+    offerId,
+}: {
+    marketplace: NearAccount;
+    offerAccepter: NearAccount;
+    offerId: number;
+}) {
     await offerAccepter.call(
         marketplace,
         "accept_offer",
@@ -91,12 +110,15 @@ export async function acceptOffer(
     );
 }
 
-export async function getTokenBalance(
-    token: string,
-    account: NearAccount,
-    worker: Worker | undefined,
-) {
-    if (worker === undefined) throw Error("Worker undefined");
+export async function getTokenBalance({
+    token,
+    account,
+    worker,
+}: {
+    token: string;
+    account: NearAccount;
+    worker: Worker;
+}) {
     const tokenAccount = worker.rootAccount.getAccount(token);
     return tokenAccount.view("ft_balance_of", { account_id: account });
 }

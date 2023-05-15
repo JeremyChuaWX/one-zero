@@ -16,6 +16,8 @@ const MARKET_DESCRIPTION = "testing";
 type Context = {
     worker: Worker;
     accounts: Record<string, NearAccount>;
+    markets: Market[];
+    offers: Offer[];
 };
 
 let context: Context;
@@ -37,17 +39,20 @@ beforeAll(async () => {
             longAccount,
             shortAccount,
         },
+        markets: [],
+        offers: [],
     };
 });
 
 describe("Create market", () => {
-    beforeAll(async () => {
-        const { marketplace, marketOwner } = context.accounts;
-        await createMarket(marketplace, marketOwner, MARKET_DESCRIPTION);
-    });
-
     test("Market is created properly", async () => {
         const { marketplace, marketOwner } = context.accounts;
+        await createMarket({
+            marketplace,
+            marketOwner,
+            description: MARKET_DESCRIPTION,
+        });
+        context.markets = await listMarkets(marketplace);
         const expected: Market[] = [
             {
                 id: 0,
@@ -59,8 +64,7 @@ describe("Create market", () => {
                 short_token_id: "m0s." + marketplace.toJSON(),
             },
         ];
-        const markets = await listMarkets(marketplace);
-        expect(markets).toStrictEqual(expected);
+        expect(context.markets).toStrictEqual(expected);
     });
 });
 
@@ -68,13 +72,24 @@ describe("Close market", () => {
     test("Market cannot be closed by non-owner", async () => {
         const { marketplace, shortAccount } = context.accounts;
         await expect(
-            closeMarket(marketplace, shortAccount, 0, true),
+            closeMarket({
+                marketplace,
+                marketOwner: shortAccount,
+                marketId: 0,
+                isLong: true,
+            }),
         ).rejects.toThrow();
     });
 
     test("Market is closed properly", async () => {
         const { marketplace, marketOwner } = context.accounts;
-        await closeMarket(marketplace, marketOwner, 0, true);
+        await closeMarket({
+            marketplace,
+            marketOwner,
+            marketId: 0,
+            isLong: true,
+        });
+        context.markets = await listMarkets(marketplace);
         const expected: Market[] = [
             {
                 id: 0,
@@ -86,14 +101,18 @@ describe("Close market", () => {
                 short_token_id: "m0s." + marketplace.toJSON(),
             },
         ];
-        const markets = await listMarkets(marketplace);
-        expect(markets).toStrictEqual(expected);
+        expect(context.markets).toStrictEqual(expected);
     });
 
     test("Cannot close an already closed market", async () => {
         const { marketplace, marketOwner } = context.accounts;
         await expect(
-            closeMarket(marketplace, marketOwner, 0, true),
+            closeMarket({
+                marketplace,
+                marketOwner,
+                marketId: 0,
+                isLong: true,
+            }),
         ).rejects.toThrow();
     });
 });
@@ -160,18 +179,18 @@ describe("Accept offer", () => {
     test("Tokens distributed properly", async () => {
         const { marketplace, longAccount, shortAccount } = context.accounts;
         await expect(
-            getTokenBalance(
-                "m0l." + marketplace.toJSON(),
-                longAccount,
-                context.worker,
-            ),
+            getTokenBalance({
+                token: "m0l." + marketplace.toJSON(),
+                account: longAccount,
+                worker: context.worker,
+            }),
         ).resolves.toBe(nearNumberToString(1));
         await expect(
-            getTokenBalance(
-                "m0s." + marketplace.toJSON(),
-                shortAccount,
-                context.worker,
-            ),
+            getTokenBalance({
+                token: "m0s." + marketplace.toJSON(),
+                account: shortAccount,
+                worker: context.worker,
+            }),
         ).resolves.toBe(nearNumberToString(1));
     });
 });
