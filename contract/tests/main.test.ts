@@ -120,7 +120,13 @@ describe("Close market", () => {
 describe("Create offer", () => {
     beforeAll(async () => {
         const { marketplace, longAccount } = context.accounts;
-        await createOffer(marketplace, longAccount, 0, true, 1);
+        await createOffer({
+            marketplace,
+            offerMaker: longAccount,
+            marketId: 0,
+            isLong: true,
+            amount: 1,
+        });
     });
 
     test("Offer is created properly", async () => {
@@ -142,27 +148,49 @@ describe("Create offer", () => {
 describe("Accept offer", () => {
     beforeAll(async () => {
         const { marketplace, marketOwner, longAccount } = context.accounts;
-        await createMarket(marketplace, marketOwner, MARKET_DESCRIPTION);
-        await createOffer(marketplace, longAccount, 1, true, 1);
+        await createMarket({
+            marketplace,
+            marketOwner,
+            description: MARKET_DESCRIPTION,
+        });
+        await createOffer({
+            marketplace,
+            offerMaker: longAccount,
+            marketId: 1,
+            isLong: true,
+            amount: 1,
+        });
     });
 
     test("Cannot accept offer on an open market", async () => {
         const { marketplace, shortAccount } = context.accounts;
         await expect(
-            acceptOffer(marketplace, shortAccount, 1),
+            acceptOffer({
+                marketplace,
+                offerAccepter: shortAccount,
+                offerId: 1,
+            }),
         ).rejects.toThrow();
     });
 
     test("Cannot accept your own offer", async () => {
         const { marketplace, longAccount } = context.accounts;
         await expect(
-            acceptOffer(marketplace, longAccount, 0),
+            acceptOffer({
+                marketplace,
+                offerAccepter: longAccount,
+                offerId: 0,
+            }),
         ).rejects.toThrow();
     });
 
     test("Offer is accepted properly", async () => {
         const { marketplace, longAccount, shortAccount } = context.accounts;
-        await acceptOffer(marketplace, shortAccount, 0);
+        await acceptOffer({
+            marketplace,
+            offerAccepter: shortAccount,
+            offerId: 0,
+        });
         const expected: Offer[] = [
             {
                 id: 1,
