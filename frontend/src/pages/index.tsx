@@ -23,18 +23,30 @@ const Home: NextPage = () => {
     const addMarketOnSumbit: FormEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
         if (!accountId) throw Error("not signed in");
-        await createMarket({ selector, accountId, description: "testing" });
+        const target = e.target as typeof e.target & {
+            description: { value: string };
+        };
+        await createMarket({
+            selector,
+            accountId,
+            description: target.description.value,
+        });
     };
 
     const addOfferOnSumbit: FormEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
         if (!accountId) throw Error("not signed in");
+        const target = e.target as typeof e.target & {
+            marketId: { value: string };
+            isLong: { checked: boolean };
+            amount: { value: string };
+        };
         await createOffer({
             selector,
             accountId,
-            marketId: 0,
-            isLong: true,
-            amount: 1,
+            marketId: parseInt(target.marketId.value),
+            isLong: target.isLong.checked,
+            amount: parseInt(target.amount.value),
         });
     };
 
@@ -45,8 +57,10 @@ const Home: NextPage = () => {
                     onSubmit={addMarketOnSumbit}
                     className="flex flex-col gap-2 w-full"
                 >
-                    <label className="font-bold">Market Description</label>
-                    <input type="text" />
+                    <label className="font-bold">
+                        Market Description
+                        <input type="text" name="description" />
+                    </label>
                     <button
                         type="submit"
                         className="py-1 px-4 text-gray-200 bg-gray-900 rounded-md"
@@ -58,6 +72,18 @@ const Home: NextPage = () => {
                     onSubmit={addOfferOnSumbit}
                     className="flex flex-col gap-2 w-full"
                 >
+                    <label className="font-bold">
+                        Market ID
+                        <input type="number" name="marketId" />
+                    </label>
+                    <label className="font-bold">
+                        is long
+                        <input type="checkbox" name="isLong" />
+                    </label>
+                    <label className="font-bold">
+                        Amount offered
+                        <input type="number" name="amount" />
+                    </label>
                     <button
                         type="submit"
                         className="py-1 px-4 text-gray-200 bg-gray-900 rounded-md"
@@ -66,11 +92,13 @@ const Home: NextPage = () => {
                     </button>
                 </form>
             </div>
+            <h1>Markets</h1>
             {markets.map((market) => (
                 <div key={market.id}>
                     {`${market.id}: ${market.description}`}
                 </div>
             ))}
+            <h1>Offers</h1>
             {offers.map((offer) => (
                 <div key={offer.id}>
                     {`${offer.id}: market ${offer.market_id} for ${offer.amount} (${offer.is_long})`}
