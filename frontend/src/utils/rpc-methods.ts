@@ -5,12 +5,17 @@ import { CodeResult } from "near-api-js/lib/providers/provider";
 const THREE_HUNDRED_TGAS = "300000000000000";
 const NO_DEPOSIT = "0";
 
-const viewMethod = async (
-    selector: WalletSelector,
-    contractId: string,
-    method: string,
-    args = {}
-) => {
+const viewMethod = async ({
+    selector,
+    contractId,
+    method,
+    args = {},
+}: {
+    selector: WalletSelector;
+    contractId: string;
+    method: string;
+    args?: Object;
+}) => {
     const { network } = selector.options;
     const provider = new providers.JsonRpcProvider({ url: network.nodeUrl });
 
@@ -30,17 +35,24 @@ type CallMethodOptions = {
     deposit: string;
 };
 
-const callMethod = async (
-    selector: WalletSelector,
-    accountId: string,
-    contractId: string,
-    method: string,
+const callMethod = async ({
+    selector,
+    accountId,
+    contractId,
+    method,
     args = {},
-    partialOptions: Partial<CallMethodOptions>
-) => {
+    partialOptions,
+}: {
+    selector: WalletSelector;
+    accountId: string;
+    contractId: string;
+    method: string;
+    args?: Object;
+    partialOptions?: Partial<CallMethodOptions>;
+}) => {
     const options: CallMethodOptions = {
-        gas: partialOptions.gas ?? THREE_HUNDRED_TGAS,
-        deposit: partialOptions.deposit ?? NO_DEPOSIT,
+        gas: partialOptions?.gas ?? THREE_HUNDRED_TGAS,
+        deposit: partialOptions?.deposit ?? NO_DEPOSIT,
     };
     const wallet = await selector.wallet();
     const outcome = await wallet.signAndSendTransaction({
