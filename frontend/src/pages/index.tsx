@@ -2,8 +2,8 @@ import { type NextPage } from "next";
 import { type FormEventHandler, useEffect, useState } from "react";
 import { useWalletSelector } from "~/contexts/WalletSelectorContext";
 import type { Offer, Market } from "~/types";
-import { getMarkets, addMarket } from "~/utils/market-methods";
-import { addOffer, getOffers } from "~/utils/offer-methods";
+import { getMarkets, createMarket } from "~/utils/contract-methods";
+import { getOffers, createOffer } from "~/utils/contract-methods";
 
 const Home: NextPage = () => {
     const { selector, accountId } = useWalletSelector();
@@ -23,13 +23,19 @@ const Home: NextPage = () => {
     const addMarketOnSumbit: FormEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
         if (!accountId) throw Error("not signed in");
-        await addMarket(selector, accountId, "testing");
+        await createMarket({ selector, accountId, description: "testing" });
     };
 
     const addOfferOnSumbit: FormEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
         if (!accountId) throw Error("not signed in");
-        await addOffer(selector, accountId, 0, true, 1);
+        await createOffer({
+            selector,
+            accountId,
+            marketId: 0,
+            isLong: true,
+            amount: 1,
+        });
     };
 
     return (

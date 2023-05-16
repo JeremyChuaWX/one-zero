@@ -14,11 +14,15 @@ const getMarkets = async (selector: WalletSelector) => {
     })) as Market[];
 };
 
-const addMarket = async (
-    selector: WalletSelector,
-    accountId: string,
-    description: string
-) => {
+const createMarket = async ({
+    selector,
+    accountId,
+    description,
+}: {
+    selector: WalletSelector;
+    accountId: string;
+    description: string;
+}) => {
     callMethod({
         selector,
         accountId,
@@ -29,17 +33,23 @@ const addMarket = async (
     });
 };
 
-const closeMarket = async (
-    selector: WalletSelector,
-    accountId: string,
-    marketId: number
-) => {
+const closeMarket = async ({
+    selector,
+    accountId,
+    marketId,
+    isLong,
+}: {
+    selector: WalletSelector;
+    accountId: string;
+    marketId: number;
+    isLong: boolean;
+}) => {
     callMethod({
         selector,
         accountId,
         contractId: env.NEXT_PUBLIC_MKTPLC_CONTRACT,
         method: "close_market",
-        args: { market_id: marketId },
+        args: { market_id: marketId, is_long: isLong },
         partialOptions: {},
     });
 };
@@ -52,13 +62,19 @@ const getOffers = async (selector: WalletSelector) => {
     })) as Offer[];
 };
 
-const createOffer = async (
-    selector: WalletSelector,
-    accountId: string,
-    marketId: number,
-    isLong: boolean,
-    amount: number
-) => {
+const createOffer = async ({
+    selector,
+    accountId,
+    marketId,
+    isLong,
+    amount,
+}: {
+    selector: WalletSelector;
+    accountId: string;
+    marketId: number;
+    isLong: boolean;
+    amount: number;
+}) => {
     const amountInYocto = utils.format.parseNearAmount(amount.toString());
 
     if (!amountInYocto) throw Error("cannot parse near amount");
@@ -73,15 +89,31 @@ const createOffer = async (
     });
 };
 
-const acceptOffer = async () => {};
+const acceptOffer = async ({
+    selector,
+    accountId,
+    offerId,
+}: {
+    selector: WalletSelector;
+    accountId: string;
+    offerId: number;
+}) => {};
 
-const cancelOffer = async () => {};
+const cancelOffer = async ({
+    selector,
+    accountId,
+    offerId,
+}: {
+    selector: WalletSelector;
+    accountId: string;
+    offerId: number;
+}) => {};
 
 const transferTokens = async () => {};
 
 export {
     getMarkets,
-    addMarket,
+    createMarket,
     closeMarket,
     getOffers,
     createOffer,
