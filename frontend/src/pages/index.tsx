@@ -68,7 +68,7 @@ const Home: NextPage = () => {
             </div>
             {markets.map((market) => (
                 <div key={market.id}>
-                    {market.id}: {market.description}
+                    {`${market.id}: ${market.description}`}
                 </div>
             ))}
             {offers.map((offer) => (
