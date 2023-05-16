@@ -6,12 +6,6 @@ Install all dependencies before starting (check all `Cargo.toml` and `package.js
 
 ### Deploy contracts on testnet
 
-Make the directory for wasm files to be copied to after building.
-
-```sh
-mkdir ./contract/tests/wasm
-```
-
 Run the dev deploy script with root directory as `./contract` to build the contracts (might need to build twice as marketplace includes bytes of token).
 
 ```sh
