@@ -71,6 +71,11 @@ const Home: NextPage = () => {
                     {market.id}: {market.description}
                 </div>
             ))}
+            {offers.map((offer) => (
+                <div key={offer.id}>
+                    {`${offer.id}: market ${offer.market_id} for ${offer.amount} (${offer.is_long})`}
+                </div>
+            ))}
         </>
     );
 };
