@@ -93,11 +93,26 @@ const acceptOffer = async ({
     selector,
     accountId,
     offerId,
+    amount,
 }: {
     selector: WalletSelector;
     accountId: string;
     offerId: number;
-}) => {};
+    amount: number;
+}) => {
+    const amountInYocto = utils.format.parseNearAmount(amount.toString());
+
+    if (!amountInYocto) throw Error("cannot parse near amount");
+
+    callMethod({
+        selector,
+        accountId,
+        contractId: env.NEXT_PUBLIC_MKTPLC_CONTRACT,
+        method: "accept_offer",
+        args: { offer_id: offerId },
+        partialOptions: { deposit: amountInYocto },
+    });
+};
 
 const cancelOffer = async ({
     selector,
@@ -107,7 +122,15 @@ const cancelOffer = async ({
     selector: WalletSelector;
     accountId: string;
     offerId: number;
-}) => {};
+}) => {
+    callMethod({
+        selector,
+        accountId,
+        contractId: env.NEXT_PUBLIC_MKTPLC_CONTRACT,
+        method: "cancel_offer",
+        args: { offer_id: offerId },
+    });
+};
 
 const transferTokens = async () => {};
 
