@@ -3,6 +3,7 @@ import type { Market, Offer } from "~/types";
 import { callMethod, viewMethod } from "./rpc-methods";
 import { env } from "~/env.mjs";
 import { utils } from "near-api-js";
+import { useQuery } from "@tanstack/react-query";
 
 const FIVE_NEAR = "5000000000000000000000000";
 
@@ -13,6 +14,12 @@ const getMarkets = async (selector: WalletSelector) => {
         method: "list_markets",
     })) as Market[];
 };
+
+const useGetMarkets = (selector: WalletSelector) =>
+    useQuery({
+        queryKey: ["get-markets"],
+        queryFn: () => getMarkets(selector),
+    });
 
 const createMarket = async ({
     selector,
@@ -60,6 +67,13 @@ const getOffers = async (selector: WalletSelector) => {
         contractId: env.NEXT_PUBLIC_MKTPLC_CONTRACT,
         method: "list_offers",
     })) as Offer[];
+};
+
+const useGetOffers = (selector: WalletSelector) => {
+    useQuery({
+        queryKey: ["get-offers"],
+        queryFn: () => getOffers(selector),
+    });
 };
 
 const createOffer = async ({
@@ -135,10 +149,10 @@ const cancelOffer = async ({
 const transferTokens = async () => {};
 
 export {
-    getMarkets,
+    useGetMarkets,
     createMarket,
     closeMarket,
-    getOffers,
+    useGetOffers,
     createOffer,
     acceptOffer,
     cancelOffer,

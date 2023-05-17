@@ -6,7 +6,7 @@ type MarketCardProps = {
 
 const MarketCard = ({ market }: MarketCardProps) => {
     return (
-        <div className="flex justify-between p-4 w-1/2 rounded-md border-2 border-gray-500">
+        <div className="flex justify-between p-4 w-full rounded-md border-2 border-gray-500">
             <span>{market.description}</span>
             {market.is_closed ? (
                 <span className="font-bold text-red-700">closed</span>
