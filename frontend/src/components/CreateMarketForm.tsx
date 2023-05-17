@@ -1,9 +1,10 @@
 import { type FormEventHandler } from "react";
 import { useWalletSelector } from "~/contexts/WalletSelectorContext";
-import { createMarket } from "~/utils/contract-methods";
+import { useCreateMarket } from "~/utils/contract-methods";
 
 const CreateMarketForm = () => {
     const { selector, accountId } = useWalletSelector();
+    const { mutate: createMarket } = useCreateMarket();
 
     const onSumbit: FormEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
@@ -11,7 +12,7 @@ const CreateMarketForm = () => {
         const target = e.target as typeof e.target & {
             description: { value: string };
         };
-        await createMarket({
+        createMarket({
             selector,
             accountId,
             description: target.description.value,

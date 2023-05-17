@@ -3,7 +3,7 @@ import type { Market, Offer } from "~/types";
 import { callMethod, viewMethod } from "./rpc-methods";
 import { env } from "~/env.mjs";
 import { utils } from "near-api-js";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const FIVE_NEAR = "5000000000000000000000000";
 
@@ -21,15 +21,17 @@ const useGetMarkets = (selector: WalletSelector) =>
         queryFn: () => getMarkets(selector),
     });
 
+type CreateMarketArgs = {
+    selector: WalletSelector;
+    accountId: string;
+    description: string;
+};
+
 const createMarket = async ({
     selector,
     accountId,
     description,
-}: {
-    selector: WalletSelector;
-    accountId: string;
-    description: string;
-}) => {
+}: CreateMarketArgs) => {
     callMethod({
         selector,
         accountId,
@@ -37,6 +39,18 @@ const createMarket = async ({
         method: "create_market",
         args: { description },
         partialOptions: { deposit: FIVE_NEAR },
+    });
+};
+
+const useCreateMarket = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (createMarketArgs: CreateMarketArgs) =>
+            createMarket(createMarketArgs),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["get-markets"] });
+        },
     });
 };
 
@@ -76,19 +90,21 @@ const useGetOffers = (selector: WalletSelector) => {
     });
 };
 
+type CreateOfferArgs = {
+    selector: WalletSelector;
+    accountId: string;
+    marketId: number;
+    isLong: boolean;
+    amount: number;
+};
+
 const createOffer = async ({
     selector,
     accountId,
     marketId,
     isLong,
     amount,
-}: {
-    selector: WalletSelector;
-    accountId: string;
-    marketId: number;
-    isLong: boolean;
-    amount: number;
-}) => {
+}: CreateOfferArgs) => {
     const amountInYocto = utils.format.parseNearAmount(amount.toString());
 
     if (!amountInYocto) throw Error("cannot parse near amount");
@@ -100,6 +116,18 @@ const createOffer = async ({
         method: "create_offer",
         args: { market_id: marketId, is_long: isLong, amount: amountInYocto },
         partialOptions: { deposit: amountInYocto },
+    });
+};
+
+const useCreateOffer = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (createOfferArgs: CreateOfferArgs) =>
+            createOffer(createOfferArgs),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["get-offers"] });
+        },
     });
 };
 
@@ -150,10 +178,10 @@ const transferTokens = async () => {};
 
 export {
     useGetMarkets,
-    createMarket,
+    useCreateMarket,
     closeMarket,
     useGetOffers,
-    createOffer,
+    useCreateOffer,
     acceptOffer,
     cancelOffer,
     transferTokens,

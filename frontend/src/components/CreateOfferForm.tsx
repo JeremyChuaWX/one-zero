@@ -1,9 +1,10 @@
 import { type FormEventHandler } from "react";
 import { useWalletSelector } from "~/contexts/WalletSelectorContext";
-import { createOffer } from "~/utils/contract-methods";
+import { useCreateOffer } from "~/utils/contract-methods";
 
 export const CreateOfferForm = () => {
     const { selector, accountId } = useWalletSelector();
+    const { mutate: createOffer } = useCreateOffer();
 
     const onSumbit: FormEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
@@ -13,7 +14,7 @@ export const CreateOfferForm = () => {
             isLong: { checked: boolean };
             amount: { value: string };
         };
-        await createOffer({
+        createOffer({
             selector,
             accountId,
             marketId: parseInt(target.marketId.value),
