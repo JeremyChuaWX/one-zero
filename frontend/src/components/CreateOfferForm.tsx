@@ -2,7 +2,7 @@ import { type FormEventHandler } from "react";
 import { useWalletSelector } from "~/contexts/WalletSelectorContext";
 import { useCreateOffer } from "~/utils/contract-methods";
 
-export const CreateOfferForm = () => {
+const CreateOfferForm = () => {
     const { selector, accountId } = useWalletSelector();
     const { mutate: createOffer } = useCreateOffer();
 
@@ -25,24 +25,42 @@ export const CreateOfferForm = () => {
 
     return (
         <form onSubmit={onSumbit} className="flex flex-col gap-2 w-full">
-            <label className="font-bold">
-                Market ID
-                <input type="number" name="marketId" />
-            </label>
-            <label className="font-bold">
-                is long
-                <input type="checkbox" name="isLong" />
-            </label>
-            <label className="font-bold">
-                Amount offered
-                <input type="number" name="amount" />
-            </label>
+            <div className="flex gap-4 items-center">
+                <label className="text-right whitespace-nowrap">
+                    Market ID
+                </label>
+                <input
+                    type="text"
+                    name="marketId"
+                    className="w-full leading-none rounded-md outline outline-1 outline-gray-500"
+                />
+            </div>
+            <div className="flex gap-4 items-center">
+                <label className="text-right whitespace-nowrap">Is Long</label>
+                <input
+                    type="text"
+                    name="isLong"
+                    className="w-full leading-none rounded-md outline outline-1 outline-gray-500"
+                />
+            </div>
+            <div className="flex gap-4 items-center">
+                <label className="text-right whitespace-nowrap">
+                    Amount Offered
+                </label>
+                <input
+                    type="text"
+                    name="amount"
+                    className="w-full leading-none rounded-md outline outline-1 outline-gray-500"
+                />
+            </div>
             <button
                 type="submit"
                 className="py-1 px-4 text-gray-200 bg-gray-900 rounded-md"
             >
-                Add Offer
+                Create Offer
             </button>
         </form>
     );
 };
+
+export default CreateOfferForm;
