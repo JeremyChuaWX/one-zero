@@ -7,6 +7,21 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const FIVE_NEAR = "5000000000000000000000000";
 
+const getMarketById = async (selector: WalletSelector, marketId: number) => {
+    return (await viewMethod({
+        selector,
+        contractId: env.NEXT_PUBLIC_MKTPLC_CONTRACT,
+        method: "get_market",
+        args: { market_id: marketId },
+    })) as Market;
+};
+
+const useGetMarketById = (selector: WalletSelector, marketId: number) =>
+    useQuery({
+        queryKey: ["get-market", marketId],
+        queryFn: () => getMarketById(selector, marketId),
+    });
+
 const getMarkets = async (selector: WalletSelector) => {
     return (await viewMethod({
         selector,
@@ -178,6 +193,7 @@ const transferTokens = async () => {};
 
 export {
     useGetMarkets,
+    useGetMarketById,
     useCreateMarket,
     closeMarket,
     useGetOffers,
