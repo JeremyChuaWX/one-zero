@@ -20,11 +20,17 @@ const CreateMarketForm = () => {
     };
 
     return (
-        <form onSubmit={onSumbit} className="flex flex-col gap-2 w-full">
-            <label className="font-bold">
-                Market Description
-                <input type="text" name="description" />
-            </label>
+        <form onSubmit={onSumbit} className="flex flex-col gap-4 w-full">
+            <div className="flex gap-4 items-center">
+                <label className="text-right whitespace-nowrap">
+                    Market Description
+                </label>
+                <input
+                    type="text"
+                    name="description"
+                    className="w-full leading-none rounded-md outline outline-1 outline-gray-500"
+                />
+            </div>
             <button
                 type="submit"
                 className="py-1 px-4 text-gray-200 bg-gray-900 rounded-md"
