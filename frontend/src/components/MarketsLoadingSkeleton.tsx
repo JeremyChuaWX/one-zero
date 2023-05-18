@@ -1,6 +1,6 @@
 const MarketCardSkeleton = () => {
     return (
-        <div className="flex justify-between p-4 w-full h-14 bg-gray-500 rounded-md border-2 border-gray-500"></div>
+        <div className="flex justify-between p-4 w-full h-14 bg-gray-300 rounded-md border-2 border-gray-300"></div>
     );
 };
 

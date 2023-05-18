@@ -21,7 +21,7 @@ const AuthButton = () => {
 
 const Navbar = () => {
     return (
-        <div className="flex justify-between items-center p-4 w-full">
+        <div className="flex justify-between items-center p-4 w-full border-b border-gray-300">
             <p className="text-2xl font-bold">One Zero</p>
             <div className="flex gap-4 items-center">
                 <p>Markets</p>
