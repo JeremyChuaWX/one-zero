@@ -11,7 +11,7 @@ const CreateOfferDialog = () => {
                 </button>
             </Dialog.Trigger>
             <Dialog.Portal>
-                <Dialog.Overlay className="fixed inset-0 bg-gray-900 data-[state=open]:animate-overlayShow" />
+                <Dialog.Overlay className="fixed inset-0 bg-gray-900 opacity-90 data-[state=open]:animate-overlayShow" />
                 <Dialog.Content className="fixed left-[50%] top-[50%] max-h-[85vh] w-[90vw] max-w-[450px] translate-x-[-50%] translate-y-[-50%] rounded-md bg-gray-200 p-4 data-[state=open]:animate-contentShow">
                     <Dialog.Title className="mb-4 font-bold text-gray-900">
                         Create Offer
