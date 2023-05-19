@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { MouseEventHandler } from "react";
 import { useWalletSelector } from "~/contexts/WalletSelectorContext";
 
@@ -22,7 +23,9 @@ const AuthButton = () => {
 const Navbar = () => {
     return (
         <div className="flex justify-between items-center p-4 w-full border-b border-gray-300">
-            <p className="text-2xl font-bold">One Zero</p>
+            <Link href="/">
+                <p className="text-2xl font-bold">One Zero</p>
+            </Link>
             <div className="flex gap-4 items-center">
                 <p>Markets</p>
                 <p>Offers</p>
