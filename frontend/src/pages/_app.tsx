@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import "~/styles/globals.css";
 import "@near-wallet-selector/modal-ui/styles.css";
+import { Toaster } from "~/components/ui/toast/toaster";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
                     <Navbar />
                     <main className="p-4 w-full h-full">
                         <Component {...pageProps} />
+                        <Toaster />
                     </main>
                 </QueryClientProvider>
             </WalletSelectorContextProvider>

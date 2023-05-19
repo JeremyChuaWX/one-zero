@@ -1,5 +1,5 @@
 import { type NextPage } from "next";
-import CreateMarketDialog from "~/components/CreateMarketDialog";
+import { CreateMarketDialog } from "~/components/CreateMarketDialog";
 import MarketCard from "~/components/MarketCard";
 import MarketLoadingSkeleton from "~/components/MarketsLoadingSkeleton";
 import { useWalletSelector } from "~/contexts/WalletSelectorContext";
