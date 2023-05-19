@@ -7,6 +7,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const FIVE_NEAR = "5000000000000000000000000";
 
+/**
+ * Calls `get_market` method on the Marketplace smart contract
+ */
 const getMarketById = async (selector: WalletSelector, marketId: number) => {
     return (await viewMethod({
         selector,
@@ -16,12 +19,18 @@ const getMarketById = async (selector: WalletSelector, marketId: number) => {
     })) as Market;
 };
 
+/**
+ * Query hook for `getMarketById`
+ */
 const useGetMarketById = (selector: WalletSelector, marketId: number) =>
     useQuery({
         queryKey: ["get-market", marketId],
         queryFn: () => getMarketById(selector, marketId),
     });
 
+/**
+ * Calls `list_markets` method on the Marketplace smart contract
+ */
 const getMarkets = async (selector: WalletSelector) => {
     return (await viewMethod({
         selector,
@@ -30,6 +39,9 @@ const getMarkets = async (selector: WalletSelector) => {
     })) as Market[];
 };
 
+/**
+ * Query hook for `getMarkets`
+ */
 const useGetMarkets = (selector: WalletSelector) =>
     useQuery({
         queryKey: ["get-markets"],
@@ -42,6 +54,9 @@ type CreateMarketArgs = {
     description: string;
 };
 
+/**
+ * Calls `create_market` method on the Marketplace smart contract
+ */
 const createMarket = async ({
     selector,
     accountId,
@@ -57,6 +72,9 @@ const createMarket = async ({
     });
 };
 
+/**
+ * Mutation hook for `createMarket`
+ */
 const useCreateMarket = () => {
     const queryClient = useQueryClient();
 
@@ -69,6 +87,9 @@ const useCreateMarket = () => {
     });
 };
 
+/**
+ * Calls `close_market` method on the Marketplace smart contract
+ */
 const closeMarket = async ({
     selector,
     accountId,
@@ -90,6 +111,9 @@ const closeMarket = async ({
     });
 };
 
+/**
+ * Calls `list_offers` method on the Marketplace smart contract
+ */
 const getOffers = async (selector: WalletSelector) => {
     return (await viewMethod({
         selector,
@@ -98,6 +122,9 @@ const getOffers = async (selector: WalletSelector) => {
     })) as Offer[];
 };
 
+/**
+ * Query hook for `getOffers`
+ */
 const useGetOffers = (selector: WalletSelector) => {
     useQuery({
         queryKey: ["get-offers"],
@@ -113,6 +140,9 @@ type CreateOfferArgs = {
     amount: number;
 };
 
+/**
+ * Calls `create_offer` method on the Marketplace smart contract
+ */
 const createOffer = async ({
     selector,
     accountId,
@@ -134,6 +164,9 @@ const createOffer = async ({
     });
 };
 
+/**
+ * Mutation hook for `createOffer`
+ */
 const useCreateOffer = () => {
     const queryClient = useQueryClient();
 
@@ -146,6 +179,9 @@ const useCreateOffer = () => {
     });
 };
 
+/**
+ * Calls `accept_offer` method on the Marketplace smart contract
+ */
 const acceptOffer = async ({
     selector,
     accountId,
@@ -171,6 +207,9 @@ const acceptOffer = async ({
     });
 };
 
+/**
+ * Calls `cancel_offer` method on the Marketplace smart contract
+ */
 const cancelOffer = async ({
     selector,
     accountId,
@@ -189,6 +228,10 @@ const cancelOffer = async ({
     });
 };
 
+/**
+ * Transfers FT from account to marketplace
+ * Rewards are distributed according to result and FT transferred
+ */
 const transferTokens = async () => {};
 
 export {
