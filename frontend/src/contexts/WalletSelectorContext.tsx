@@ -13,8 +13,8 @@ import {
 } from "react";
 import { distinctUntilChanged, map } from "rxjs";
 
-import Loading from "~/components/Loading";
-import { env } from "~/env.mjs";
+import Loading from "@/components/Loading";
+import { env } from "@/env.mjs";
 
 declare global {
     interface Window {
