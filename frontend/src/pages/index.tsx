@@ -1,14 +1,5 @@
-import Head from "next/head";
+import { Box } from "@chakra-ui/react";
 
 export default function Home() {
-    return (
-        <>
-            <Head>
-                <title>One Zero</title>
-            </Head>
-            <main>
-                <div>hi</div>
-            </main>
-        </>
-    );
+    return <Box>hello</Box>;
 }
