@@ -1,7 +1,7 @@
 import type { WalletSelector } from "@near-wallet-selector/core";
-import type { Market, Offer } from "~/types";
+import type { Market, Offer } from "@/types";
 import { callMethod, viewMethod } from "./rpc-methods";
-import { env } from "~/env.mjs";
+import { env } from "@/env.mjs";
 import { utils } from "near-api-js";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
