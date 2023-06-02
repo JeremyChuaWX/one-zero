@@ -30,15 +30,7 @@ const Navbar = () => {
             <Link as={NextLink} href="/">
                 <Heading size="md">One-Zero</Heading>
             </Link>
-            <Box display="flex" gap="4" alignItems="center">
-                <Link as={NextLink} href="/">
-                    Markets
-                </Link>
-                <Link as={NextLink} href="/">
-                    Offers
-                </Link>
-                <AuthButton />
-            </Box>
+            <AuthButton />
         </Box>
     );
 };
