@@ -2,7 +2,7 @@ import { WalletSelectorContextProvider } from "@/contexts/WalletSelectorContext"
 import { Box, ChakraProvider } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { AppProps } from "next/app";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/navbar";
 import Head from "next/head";
 
 import "@near-wallet-selector/modal-ui/styles.css";

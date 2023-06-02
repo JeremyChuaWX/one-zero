@@ -13,7 +13,7 @@ import {
 } from "react";
 import { distinctUntilChanged, map } from "rxjs";
 
-import Loading from "@/components/Loading";
+import Loading from "@/components/loading";
 import { env } from "@/env.mjs";
 
 declare global {
