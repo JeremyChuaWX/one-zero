@@ -23,7 +23,7 @@ const App = ({ Component, pageProps }: AppProps) => {
                 <QueryClientProvider client={queryClient}>
                     <WalletSelectorContextProvider>
                         <Navbar />
-                        <Box as="main" paddingX="4">
+                        <Box as="main" width="70%" marginX="auto" marginTop="8">
                             <Component {...pageProps} />
                         </Box>
                     </WalletSelectorContextProvider>

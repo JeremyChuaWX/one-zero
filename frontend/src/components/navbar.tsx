@@ -26,6 +26,8 @@ const Navbar = () => {
             paddingY="4"
             alignItems="center"
             justifyContent="space-between"
+            borderBottom="1px"
+            borderColor="gray.300"
         >
             <Link as={NextLink} href="/">
                 <Heading size="md">One-Zero</Heading>
