@@ -1,4 +1,4 @@
-import { WalletSelectorContextProvider } from "@/contexts/WalletSelectorContext";
+import { WalletSelectorContextProvider } from "@/contexts/wallet-selector-context";
 import { Box, ChakraProvider } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { AppProps } from "next/app";

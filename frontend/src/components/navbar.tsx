@@ -1,4 +1,4 @@
-import { useWalletSelector } from "@/contexts/WalletSelectorContext";
+import { useWalletSelector } from "@/contexts/wallet-selector-context";
 import { Box, Button, Heading, Link } from "@chakra-ui/react";
 import { MouseEventHandler } from "react";
 import NextLink from "next/link";
