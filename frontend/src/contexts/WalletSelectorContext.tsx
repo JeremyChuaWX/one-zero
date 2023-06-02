@@ -34,7 +34,7 @@ const WalletSelectorContext = createContext<WalletSelectorContextValue | null>(
     null
 );
 
-export const WalletSelectorContextProvider: FC<{
+const WalletSelectorContextProvider: FC<{
     children: ReactNode;
 }> = ({ children }) => {
     const [selector, setSelector] = useState<WalletSelector | null>(null);
@@ -114,7 +114,7 @@ export const WalletSelectorContextProvider: FC<{
     );
 };
 
-export function useWalletSelector() {
+const useWalletSelector = () => {
     const context = useContext(WalletSelectorContext);
 
     if (!context) {
@@ -124,4 +124,6 @@ export function useWalletSelector() {
     }
 
     return context;
-}
+};
+
+export { WalletSelectorContextProvider, useWalletSelector };

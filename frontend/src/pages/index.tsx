@@ -1,5 +1,7 @@
 import { Box } from "@chakra-ui/react";
 
-export default function Home() {
+const Home = () => {
     return <Box>hello</Box>;
-}
+};
+
+export default Home;

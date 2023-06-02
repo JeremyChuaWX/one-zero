@@ -7,7 +7,7 @@ import Head from "next/head";
 
 import "@near-wallet-selector/modal-ui/styles.css";
 
-export default function App({ Component, pageProps }: AppProps) {
+const App = ({ Component, pageProps }: AppProps) => {
     const queryClient = new QueryClient();
 
     return (
@@ -31,4 +31,6 @@ export default function App({ Component, pageProps }: AppProps) {
             </ChakraProvider>
         </>
     );
-}
+};
+
+export default App;

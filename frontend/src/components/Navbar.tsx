@@ -1,8 +1,9 @@
 import { useWalletSelector } from "@/contexts/WalletSelectorContext";
-import { Box, Button, Heading, Text } from "@chakra-ui/react";
+import { Box, Button, Heading, Link } from "@chakra-ui/react";
 import { MouseEventHandler } from "react";
+import NextLink from "next/link";
 
-function AuthButton() {
+const AuthButton = () => {
     const { modal, accountId } = useWalletSelector();
 
     const signInOnClick: MouseEventHandler<HTMLButtonElement> = (e) => {
@@ -15,9 +16,9 @@ function AuthButton() {
             {accountId ?? "Connect Wallet"}
         </Button>
     );
-}
+};
 
-function Navbar() {
+const Navbar = () => {
     return (
         <Box
             display="flex"
@@ -26,14 +27,20 @@ function Navbar() {
             alignItems="center"
             justifyContent="space-between"
         >
-            <Heading size="md">One-Zero</Heading>
+            <Link as={NextLink} href="/">
+                <Heading size="md">One-Zero</Heading>
+            </Link>
             <Box display="flex" gap="4" alignItems="center">
-                <Text>Markets</Text>
-                <Text>Offers</Text>
+                <Link as={NextLink} href="/">
+                    Markets
+                </Link>
+                <Link as={NextLink} href="/">
+                    Offers
+                </Link>
                 <AuthButton />
             </Box>
         </Box>
     );
-}
+};
 
 export default Navbar;
