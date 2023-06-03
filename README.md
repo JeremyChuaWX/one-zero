@@ -47,5 +47,5 @@ NEXT_PUBLIC_MKTPLC_CONTRACT="<account_id_here>"
 Start the dev server.
 
 ```sh
-pnpm run dev
+npm run dev
 ```
