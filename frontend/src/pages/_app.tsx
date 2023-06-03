@@ -1,5 +1,5 @@
 import { WalletSelectorContextProvider } from "@/contexts/wallet-selector-context";
-import { Box, ChakraProvider } from "@chakra-ui/react";
+import { Box, CSSReset, ChakraProvider } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { AppProps } from "next/app";
 import Navbar from "@/components/navbar";
@@ -12,6 +12,7 @@ const App = ({ Component, pageProps }: AppProps) => {
 
     return (
         <>
+            <CSSReset />
             <Head>
                 <title>One Zero</title>
                 <meta
