@@ -53,7 +53,9 @@ const CreateMarketModal = () => {
 
     return (
         <>
-            <Button onClick={onOpen}>Create Market</Button>
+            <Button variant="outline" onClick={onOpen}>
+                Create Market
+            </Button>
 
             <Modal isOpen={isOpen} onClose={onClose} size="xl" isCentered>
                 <ModalOverlay />

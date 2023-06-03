@@ -1,6 +1,6 @@
 import { useWalletSelector } from "@/contexts/wallet-selector-context";
 import { useGetMarketById } from "@/utils/contract-methods";
-import { Box, Spinner } from "@chakra-ui/react";
+import { Box, Spinner, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 
 const MarketPage = () => {
@@ -16,7 +16,16 @@ const MarketPage = () => {
 
     if (isLoading) return <Spinner />;
 
-    return <Box>{market === undefined ? "waiting" : market.description}</Box>;
+    return (
+        <Box>
+            {market !== undefined &&
+                Object.entries(market).map(([key, value]) => (
+                    <Text>
+                        {key} : {value}
+                    </Text>
+                ))}
+        </Box>
+    );
 };
 
 export default MarketPage;

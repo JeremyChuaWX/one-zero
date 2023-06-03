@@ -1,7 +1,7 @@
 import MarketCard from "@/components/market-card";
 import { useWalletSelector } from "@/contexts/wallet-selector-context";
 import { useGetMarkets } from "@/utils/contract-methods";
-import { Box, Button, ButtonGroup, Heading, Spinner } from "@chakra-ui/react";
+import { Box, Heading, Spinner } from "@chakra-ui/react";
 import CreateMarketModal from "@/components/add-market-modal";
 
 const Home = () => {
@@ -10,25 +10,23 @@ const Home = () => {
     const { data: markets, isLoading } = useGetMarkets(selector);
 
     return (
-        <Box display="flex" flexDir="column" gap="8">
-            <ButtonGroup variant="outline">
+        <Box display="flex" flexDir="column" gap="4">
+            <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+            >
+                <Heading size="md">Markets</Heading>
                 <CreateMarketModal />
-                <Button>Create Offer</Button>
-            </ButtonGroup>
-            <Box>
-                <Heading size="md" marginBottom="4">
-                    Markets
-                </Heading>
+            </Box>
+
+            <Box display="flex" flexDir="column">
                 {isLoading ? (
-                    <Box display="flex" flexDir="column" alignItems="center">
-                        <Spinner size="lg" />
-                    </Box>
+                    <Spinner size="lg" alignSelf="center" margin="4" />
                 ) : (
-                    <Box display="flex" flexDir="column">
-                        {markets?.map((market, idx) => (
-                            <MarketCard market={market} key={idx} />
-                        ))}
-                    </Box>
+                    markets?.map((market, idx) => (
+                        <MarketCard market={market} key={idx} />
+                    ))
                 )}
             </Box>
         </Box>
