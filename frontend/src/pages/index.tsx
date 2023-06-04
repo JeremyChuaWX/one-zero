@@ -2,7 +2,7 @@ import MarketCard from "@/components/market-card";
 import { useWalletSelector } from "@/contexts/wallet-selector-context";
 import { useGetMarkets } from "@/utils/contract-methods";
 import { Box, Heading, Spinner } from "@chakra-ui/react";
-import CreateMarketModal from "@/components/add-market-modal";
+import CreateMarketModal from "@/components/create-market-modal";
 
 const Home = () => {
     const { selector } = useWalletSelector();
