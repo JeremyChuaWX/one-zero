@@ -1,3 +1,4 @@
+import CreateOfferModal from "@/components/create-offer-modal";
 import { useWalletSelector } from "@/contexts/wallet-selector-context";
 import { useGetMarketById } from "@/utils/contract-methods";
 import { Box, Spinner, Text } from "@chakra-ui/react";
@@ -14,7 +15,7 @@ const MarketPage = () => {
         parseInt(id as string)
     );
 
-    if (isLoading) {
+    if (isLoading || !market) {
         return (
             <Box display="flex" justifyContent="center">
                 <Spinner size="xl" />
@@ -23,14 +24,17 @@ const MarketPage = () => {
     }
 
     return (
-        <Box>
-            {market !== undefined &&
-                Object.entries(market).map(([key, value]) => (
-                    <Text>
-                        {key} : {value}
-                    </Text>
-                ))}
-        </Box>
+        <>
+            <Box>
+                {market !== undefined &&
+                    Object.entries(market).map(([key, value]) => (
+                        <Text>
+                            {key} : {value}
+                        </Text>
+                    ))}
+            </Box>
+            <CreateOfferModal marketId={market.id} />
+        </>
     );
 };
 
