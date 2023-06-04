@@ -14,7 +14,13 @@ const MarketPage = () => {
         parseInt(id as string)
     );
 
-    if (isLoading) return <Spinner />;
+    if (isLoading) {
+        return (
+            <Box display="flex" justifyContent="center">
+                <Spinner size="xl" />
+            </Box>
+        );
+    }
 
     return (
         <Box>
