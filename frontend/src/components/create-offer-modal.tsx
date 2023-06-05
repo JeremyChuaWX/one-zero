@@ -98,10 +98,7 @@ const CreateOfferModal = (
 
                                 <FormControl>
                                     <FormLabel>Is the offer long?</FormLabel>
-                                    <Switch
-                                        {...register("isLong")}
-                                        placeholder="Enter market description here"
-                                    />
+                                    <Switch {...register("isLong")} />
                                 </FormControl>
                             </Box>
                         </form>
