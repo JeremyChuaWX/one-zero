@@ -30,7 +30,7 @@ const MarketPage = () => {
     if (isLoading || !market) {
         return (
             <Box display="flex" justifyContent="center">
-                <Spinner size="lg" />
+                <Spinner size="lg" color="gray.300" />
             </Box>
         );
     }
@@ -58,14 +58,14 @@ const Offers = ({ marketId }: { marketId: number }) => {
 
 const MarketInfo = ({ market }: { market: Market }) => {
     return (
-        <Card display="flex" justifyContent="space-between" variant="outline">
-            <CardHeader display="flex" justifyContent="space-between">
+        <Card display="flex" variant="outline">
+            <CardHeader display="flex" gap="4" alignItems="center">
                 <Heading size="md" textTransform="uppercase">
                     Market {market.id}
                 </Heading>
                 <Badge
                     colorScheme={market.is_closed ? "red" : "green"}
-                    fontSize="lg"
+                    fontSize="md"
                     fontWeight="bold"
                     height="max-content"
                 >

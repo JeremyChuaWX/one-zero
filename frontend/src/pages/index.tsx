@@ -24,7 +24,14 @@ const Home = () => {
 
             <Box display="flex" flexDir="column">
                 {isLoading
-                    ? <Spinner size="lg" alignSelf="center" margin="4" />
+                    ? (
+                        <Spinner
+                            size="lg"
+                            alignSelf="center"
+                            margin="4"
+                            color="gray.300"
+                        />
+                    )
                     : (
                         markets?.map((market, idx) => (
                             <MarketCard market={market} key={idx} />
