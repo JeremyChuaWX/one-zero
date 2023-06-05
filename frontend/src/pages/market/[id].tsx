@@ -38,19 +38,22 @@ const MarketPage = () => {
     return (
         <Box display="flex" flexDir="column" gap="4">
             <MarketInfo market={market} />
-            <Offers marketId={market.id} />
+            <Offers market={market} />
         </Box>
     );
 };
 
-const Offers = ({ marketId }: { marketId: number }) => {
+const Offers = ({ market }: { market: Market }) => {
     return (
         <Box display="flex" flexDir="column" gap="4">
             <Box display="flex" justifyContent="space-between">
                 <Heading size="md" textTransform="uppercase">
                     Offers
                 </Heading>
-                <CreateOfferModal marketId={marketId} />
+                <CreateOfferModal
+                    marketId={market.id}
+                    disabled={market.is_closed}
+                />
             </Box>
         </Box>
     );
