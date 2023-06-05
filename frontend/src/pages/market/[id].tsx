@@ -1,4 +1,5 @@
 import CreateOfferModal from "@/components/create-offer-modal";
+import OfferCard from "@/components/offer-card";
 import { useWalletSelector } from "@/contexts/wallet-selector-context";
 import { Market } from "@/types";
 import {
@@ -47,7 +48,7 @@ const MarketPage = () => {
 };
 
 const MarketOffers = ({ market }: { market: Market }) => {
-    const { selector } = useWalletSelector();
+    const { accountId, selector } = useWalletSelector();
 
     const { data: offers, isLoading } = useGetOffersByMarketId(
         selector,
@@ -75,10 +76,11 @@ const MarketOffers = ({ market }: { market: Market }) => {
             </Box>
             <Box display="flex" flexDir="column" gap="4">
                 {offers.map((offer) => (
-                    <Text>
-                        {offer.account_id}: {offer.amount}{" "}
-                        ({offer.is_long ? "long" : "short"})
-                    </Text>
+                    <OfferCard
+                        offer={offer}
+                        isOwner={accountId === market.owner_id}
+                        isAccount={accountId === offer.account_id}
+                    />
                 ))}
             </Box>
         </Box>
