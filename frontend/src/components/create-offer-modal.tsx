@@ -80,7 +80,7 @@ const CreateOfferModal = (
                             id="create-offer-form"
                             onSubmit={createOfferOnSumbit}
                         >
-                            <Box display="flex" flexDir="column" gap="4">
+                            <Box display="flex" flexDir="column" gap="8">
                                 <FormControl isRequired>
                                     <FormLabel>Amount Offered</FormLabel>
                                     <NumberInput min={1}>
@@ -96,8 +96,12 @@ const CreateOfferModal = (
                                     </NumberInput>
                                 </FormControl>
 
-                                <FormControl>
-                                    <FormLabel>Is the offer long?</FormLabel>
+                                <FormControl
+                                    display="flex"
+                                    justifyContent="space-between"
+                                    alignItems="center"
+                                >
+                                    <FormLabel>Is the market long?</FormLabel>
                                     <Switch {...register("isLong")} />
                                 </FormControl>
                             </Box>
