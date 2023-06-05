@@ -12,7 +12,7 @@ const MarketPage = () => {
 
     const { data: market, isLoading } = useGetMarketById(
         selector,
-        parseInt(id as string)
+        parseInt(id as string),
     );
 
     if (isLoading || !market) {
@@ -28,7 +28,7 @@ const MarketPage = () => {
             <Box>
                 {market !== undefined &&
                     Object.entries(market).map(([key, value]) => (
-                        <Text>
+                        <Text key={key}>
                             {key} : {value}
                         </Text>
                     ))}
