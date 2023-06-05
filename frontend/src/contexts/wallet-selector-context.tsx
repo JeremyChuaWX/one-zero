@@ -3,6 +3,7 @@ import { setupWalletSelector } from "@near-wallet-selector/core";
 import type { WalletSelectorModal } from "@near-wallet-selector/modal-ui";
 import { setupModal } from "@near-wallet-selector/modal-ui";
 import { setupNearWallet } from "@near-wallet-selector/near-wallet";
+import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet";
 import type { FC, ReactNode } from "react";
 import {
     createContext,
@@ -45,7 +46,7 @@ const WalletSelectorContextProvider: FC<{
         const _selector = await setupWalletSelector({
             network: "testnet",
             debug: true,
-            modules: [setupNearWallet()],
+            modules: [setupNearWallet(), setupMyNearWallet()],
         });
         const _modal = setupModal(_selector, {
             contractId: env.NEXT_PUBLIC_MKTPLC_CONTRACT,
