@@ -1,27 +1,27 @@
 import { useWalletSelector } from "@/contexts/wallet-selector-context";
 import { useCreateOffer } from "@/utils/contract-methods";
 import {
-    useDisclosure,
-    useToast,
     Button,
-    Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalHeader,
-    ModalCloseButton,
-    ModalBody,
-    ModalFooter,
     ButtonGroup,
     FormControl,
     FormLabel,
-    Switch,
+    Modal,
+    ModalBody,
+    ModalCloseButton,
+    ModalContent,
+    ModalFooter,
+    ModalHeader,
+    ModalOverlay,
+    NumberDecrementStepper,
+    NumberIncrementStepper,
     NumberInput,
     NumberInputField,
     NumberInputStepper,
-    NumberIncrementStepper,
-    NumberDecrementStepper,
+    Switch,
+    useDisclosure,
+    useToast,
 } from "@chakra-ui/react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 type CreateOfferFormInput = {
     amount: number;
@@ -33,7 +33,7 @@ const CreateOfferModal = ({ marketId }: { marketId: number }) => {
 
     const toast = useToast();
 
-    const { control, handleSubmit } = useForm<CreateOfferFormInput>();
+    const { handleSubmit, register } = useForm<CreateOfferFormInput>();
 
     const { selector, accountId } = useWalletSelector();
 
@@ -80,15 +80,9 @@ const CreateOfferModal = ({ marketId }: { marketId: number }) => {
                             <FormControl isRequired>
                                 <FormLabel>Amount Offered</FormLabel>
                                 <NumberInput min={1}>
-                                    <Controller
-                                        name="amount"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <NumberInputField
-                                                {...field}
-                                                placeholder="Enter amount offered here"
-                                            />
-                                        )}
+                                    <NumberInputField
+                                        {...register("amount")}
+                                        placeholder="Enter amount offered here"
                                     />
 
                                     <NumberInputStepper>
@@ -100,15 +94,9 @@ const CreateOfferModal = ({ marketId }: { marketId: number }) => {
 
                             <FormControl isRequired>
                                 <FormLabel>Is the offer long?</FormLabel>
-                                <Controller
-                                    name="isLong"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <Switch
-                                            {...field}
-                                            placeholder="Enter market description here"
-                                        />
-                                    )}
+                                <Switch
+                                    {...register("isLong")}
+                                    placeholder="Enter market description here"
                                 />
                             </FormControl>
                         </form>

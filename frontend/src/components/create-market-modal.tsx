@@ -1,22 +1,22 @@
 import { useWalletSelector } from "@/contexts/wallet-selector-context";
 import { useCreateMarket } from "@/utils/contract-methods";
 import {
-    useDisclosure,
-    useToast,
     Button,
-    Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalHeader,
-    ModalCloseButton,
-    ModalBody,
-    ModalFooter,
     ButtonGroup,
     FormControl,
     FormLabel,
+    Modal,
+    ModalBody,
+    ModalCloseButton,
+    ModalContent,
+    ModalFooter,
+    ModalHeader,
+    ModalOverlay,
     Textarea,
+    useDisclosure,
+    useToast,
 } from "@chakra-ui/react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 type CreateMarketFormInput = {
     description: string;
@@ -27,7 +27,9 @@ const CreateMarketModal = () => {
 
     const toast = useToast();
 
-    const { control, handleSubmit } = useForm<CreateMarketFormInput>();
+    const { handleSubmit, register } = useForm<
+        CreateMarketFormInput
+    >();
 
     const { selector, accountId } = useWalletSelector();
 
@@ -71,15 +73,9 @@ const CreateMarketModal = () => {
                         >
                             <FormControl isRequired>
                                 <FormLabel>Market Description</FormLabel>
-                                <Controller
-                                    name="description"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <Textarea
-                                            {...field}
-                                            placeholder="Enter market description here"
-                                        />
-                                    )}
+                                <Textarea
+                                    {...register("description")}
+                                    placeholder="Enter market description here"
                                 />
                             </FormControl>
                         </form>
