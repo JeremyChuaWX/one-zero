@@ -17,15 +17,20 @@ const OfferCard = (
             _last={{ borderBottom: 0 }}
         >
             <Box display="flex" alignItems="center" gap="2">
-                <Text>
-                    {utils.format.formatNearAmount(offer.amount)} NEAR
-                </Text>
-                <Badge
-                    colorScheme={offer.is_long ? "green" : "yellow"}
-                    fontWeight="bold"
-                >
-                    {offer.is_long ? "long" : "short"}
-                </Badge>
+                <Box display="flex" flexDir="column">
+                    <Box display="flex" alignItems="center" gap="2">
+                        <Text>
+                            {utils.format.formatNearAmount(offer.amount)} NEAR
+                        </Text>
+                        <Badge
+                            colorScheme={offer.is_long ? "green" : "yellow"}
+                            fontWeight="bold"
+                        >
+                            {offer.is_long ? "long" : "short"}
+                        </Badge>
+                    </Box>
+                    <Text fontSize="xs">{offer.account_id}</Text>
+                </Box>
             </Box>
             <AcceptOfferModal offer={offer} disabled={acceptDisabled} />
         </Box>
