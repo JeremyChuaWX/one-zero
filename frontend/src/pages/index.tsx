@@ -21,13 +21,13 @@ const Home = () => {
             </Box>
 
             <Box display="flex" flexDir="column">
-                {isLoading ? (
-                    <Spinner size="lg" alignSelf="center" margin="4" />
-                ) : (
-                    markets?.map((market, idx) => (
-                        <MarketCard market={market} key={idx} />
-                    ))
-                )}
+                {isLoading
+                    ? <Spinner size="lg" alignSelf="center" margin="4" />
+                    : (
+                        markets?.map((market, idx) => (
+                            <MarketCard market={market} key={idx} />
+                        ))
+                    )}
             </Box>
         </Box>
     );
