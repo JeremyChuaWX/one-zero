@@ -3,6 +3,8 @@ import { useCloseMarket } from "@/utils/contract-methods";
 import {
     Button,
     ButtonGroup,
+    FormControl,
+    FormLabel,
     Modal,
     ModalBody,
     ModalCloseButton,
@@ -10,23 +12,28 @@ import {
     ModalFooter,
     ModalHeader,
     ModalOverlay,
+    Switch,
     useDisclosure,
     useToast,
 } from "@chakra-ui/react";
-import { MouseEventHandler } from "react";
+import { useForm } from "react-hook-form";
+
+type CloseMarketFormInput = {
+    isLong: boolean;
+};
 
 const CloseMarketModal = ({ marketId }: { marketId: number }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const toast = useToast();
 
+    const { handleSubmit, register } = useForm<CloseMarketFormInput>();
+
     const { accountId, selector } = useWalletSelector();
 
     const { mutate: closeMarket } = useCloseMarket();
 
-    const closeMarketOnClick: MouseEventHandler<HTMLButtonElement> = (e) => {
-        e.preventDefault();
-
+    const closeMarketOnSubmit = handleSubmit((input) => {
         if (accountId === null) {
             toast({
                 status: "error",
@@ -41,9 +48,9 @@ const CloseMarketModal = ({ marketId }: { marketId: number }) => {
             selector,
             accountId,
             marketId,
-            isLong: true,
+            isLong: input.isLong,
         });
-    };
+    });
 
     return (
         <>
@@ -58,7 +65,16 @@ const CloseMarketModal = ({ marketId }: { marketId: number }) => {
                     <ModalCloseButton />
 
                     <ModalBody>
-                        Are you sure you want to close this market?
+                        <form>
+                            <FormControl
+                                display="flex"
+                                justifyContent="space-between"
+                                alignItems="center"
+                            >
+                                <FormLabel>Is the market long?</FormLabel>
+                                <Switch {...register("isLong")} />
+                            </FormControl>
+                        </form>
                     </ModalBody>
 
                     <ModalFooter>
@@ -68,7 +84,7 @@ const CloseMarketModal = ({ marketId }: { marketId: number }) => {
                             </Button>
                             <Button
                                 colorScheme="red"
-                                onClick={closeMarketOnClick}
+                                onClick={closeMarketOnSubmit}
                             >
                                 Close Market
                             </Button>
