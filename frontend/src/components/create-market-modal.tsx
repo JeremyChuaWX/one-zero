@@ -22,7 +22,7 @@ type CreateMarketFormInput = {
     description: string;
 };
 
-const CreateMarketModal = () => {
+const CreateMarketModal = ({ disabled }: { disabled: boolean }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const toast = useToast();
@@ -55,7 +55,7 @@ const CreateMarketModal = () => {
 
     return (
         <>
-            <Button variant="outline" onClick={onOpen}>
+            <Button variant="outline" onClick={onOpen} isDisabled={disabled}>
                 Create Market
             </Button>
 
