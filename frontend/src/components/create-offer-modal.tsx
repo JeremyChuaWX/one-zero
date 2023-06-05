@@ -23,6 +23,7 @@ import {
     useToast,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
+import { utils } from "near-api-js";
 
 type CreateOfferFormInput = {
     amount: number;
@@ -53,11 +54,23 @@ const CreateOfferModal = (
             return;
         }
 
+        const amount = utils.format.parseNearAmount(input.amount.toString());
+
+        if (!amount) {
+            toast({
+                status: "error",
+                description: "Cannot parse amount to NEAR balance",
+                isClosable: true,
+                position: "bottom-right",
+            });
+            return;
+        }
+
         createOffer({
             selector,
             accountId,
             marketId,
-            amount: input.amount,
+            amount,
             isLong: input.isLong,
         });
     });

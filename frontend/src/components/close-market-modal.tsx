@@ -22,7 +22,9 @@ type CloseMarketFormInput = {
     isLong: boolean;
 };
 
-const CloseMarketModal = ({ marketId }: { marketId: number }) => {
+const CloseMarketModal = (
+    { marketId, disabled }: { marketId: number; disabled: boolean },
+) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const toast = useToast();
@@ -54,7 +56,7 @@ const CloseMarketModal = ({ marketId }: { marketId: number }) => {
 
     return (
         <>
-            <Button variant="outline" onClick={onOpen}>
+            <Button variant="outline" onClick={onOpen} isDisabled={disabled}>
                 Close Market
             </Button>
 

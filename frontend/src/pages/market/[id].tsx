@@ -73,9 +73,10 @@ const MarketInfoCard = ({ market }: { market: Market }) => {
                         {market.is_closed ? "Closed" : "Open"}
                     </Badge>
                 </Box>
-                <Box opacity={(isOwner && !market.is_closed) ? "100" : "0"}>
-                    <CloseMarketModal marketId={market.id} />
-                </Box>
+                <CloseMarketModal
+                    marketId={market.id}
+                    disabled={!isOwner || market.is_closed}
+                />
             </CardHeader>
 
             <CardBody>
@@ -132,8 +133,8 @@ const MarketOffersList = ({ market }: { market: Market }) => {
                     <OfferCard
                         key={idx}
                         offer={offer}
-                        acceptEnabled={(accountId !== market.owner_id) &&
-                            (accountId !== offer.account_id)}
+                        acceptDisabled={(accountId === market.owner_id) ||
+                            (accountId === offer.account_id)}
                     />
                 ))}
             </Box>

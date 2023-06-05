@@ -1,9 +1,10 @@
-import { Badge, Box, Button, Text } from "@chakra-ui/react";
+import { Badge, Box, Text } from "@chakra-ui/react";
 import type { Offer } from "@/types";
-import { formatNearAmount } from "near-api-js/lib/utils/format";
+import { utils } from "near-api-js";
+import AcceptOfferModal from "./accept-offer-modal";
 
 const OfferCard = (
-    { offer, acceptEnabled }: { offer: Offer; acceptEnabled: boolean },
+    { offer, acceptDisabled }: { offer: Offer; acceptDisabled: boolean },
 ) => {
     return (
         <Box
@@ -17,7 +18,7 @@ const OfferCard = (
         >
             <Box display="flex" alignItems="center" gap="2">
                 <Text>
-                    {formatNearAmount(offer.amount)} NEAR
+                    {utils.format.formatNearAmount(offer.amount)} NEAR
                 </Text>
                 <Badge
                     colorScheme={offer.is_long ? "green" : "yellow"}
@@ -26,11 +27,7 @@ const OfferCard = (
                     {offer.is_long ? "long" : "short"}
                 </Badge>
             </Box>
-            <Box opacity={acceptEnabled ? "100" : "0"}>
-                <Button size="sm" isDisabled={acceptEnabled}>
-                    Accept Offer
-                </Button>
-            </Box>
+            <AcceptOfferModal offer={offer} disabled={acceptDisabled} />
         </Box>
     );
 };

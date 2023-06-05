@@ -2,14 +2,10 @@ import type { WalletSelector } from "@near-wallet-selector/core";
 import type { Market, Offer } from "@/types";
 import { callMethod, viewMethod } from "./rpc-methods";
 import { env } from "@/env.mjs";
-import { utils } from "near-api-js";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const FIVE_NEAR = "5000000000000000000000000";
 
-/**
- * Calls `get_market` method on the Marketplace smart contract
- */
 const getMarketById = async (selector: WalletSelector, marketId: number) => {
     return (await viewMethod({
         selector,
@@ -19,9 +15,6 @@ const getMarketById = async (selector: WalletSelector, marketId: number) => {
     })) as Market;
 };
 
-/**
- * Query hook for `getMarketById`
- */
 const useGetMarketById = (selector: WalletSelector, marketId: number) => {
     return useQuery({
         queryKey: ["get-market", marketId],
@@ -29,9 +22,6 @@ const useGetMarketById = (selector: WalletSelector, marketId: number) => {
     });
 };
 
-/**
- * Calls `list_markets` method on the Marketplace smart contract
- */
 const getMarkets = async (selector: WalletSelector) => {
     return (await viewMethod({
         selector,
@@ -40,9 +30,6 @@ const getMarkets = async (selector: WalletSelector) => {
     })) as Market[];
 };
 
-/**
- * Query hook for `getMarkets`
- */
 const useGetMarkets = (selector: WalletSelector) => {
     return useQuery({
         queryKey: ["get-markets"],
@@ -50,9 +37,6 @@ const useGetMarkets = (selector: WalletSelector) => {
     });
 };
 
-/**
- * Calls `create_market` method on the Marketplace smart contract
- */
 const createMarket = async ({
     selector,
     accountId,
@@ -72,9 +56,6 @@ const createMarket = async ({
     });
 };
 
-/**
- * Mutation hook for `createMarket`
- */
 const useCreateMarket = () => {
     const queryClient = useQueryClient();
 
@@ -86,9 +67,6 @@ const useCreateMarket = () => {
     });
 };
 
-/**
- * Calls `close_market` method on the Marketplace smart contract
- */
 const closeMarket = async ({
     selector,
     accountId,
@@ -110,9 +88,6 @@ const closeMarket = async ({
     });
 };
 
-/**
- * Mutation hook for `closeMarket`
- */
 const useCloseMarket = () => {
     const queryClient = useQueryClient();
 
@@ -124,30 +99,6 @@ const useCloseMarket = () => {
     });
 };
 
-/**
- * Calls `list_offers` method on the Marketplace smart contract
- */
-const getOffers = async (selector: WalletSelector) => {
-    return (await viewMethod({
-        selector,
-        contractId: env.NEXT_PUBLIC_MKTPLC_CONTRACT,
-        method: "list_offers",
-    })) as Offer[];
-};
-
-/**
- * Query hook for `getOffers`
- */
-const useGetOffers = (selector: WalletSelector) => {
-    return useQuery({
-        queryKey: ["get-offers"],
-        queryFn: () => getOffers(selector),
-    });
-};
-
-/**
- * Calls `list_offers_by_market` method on the Marketplace smart contract
- */
 const getOffersByMarketId = async (
     selector: WalletSelector,
     marketId: number,
@@ -160,9 +111,6 @@ const getOffersByMarketId = async (
     })) as Offer[];
 };
 
-/**
- * Query hook for `getOffersByMarketId`
- */
 const useGetOffersByMarketId = (selector: WalletSelector, marketId: number) => {
     return useQuery({
         queryKey: ["get-offers", marketId],
@@ -170,49 +118,35 @@ const useGetOffersByMarketId = (selector: WalletSelector, marketId: number) => {
     });
 };
 
-type CreateOfferArgs = {
-    selector: WalletSelector;
-    accountId: string;
-    marketId: number;
-    isLong: boolean;
-    amount: number;
-};
-
-/**
- * Calls `create_offer` method on the Marketplace smart contract
- */
 const createOffer = async ({
     selector,
     accountId,
     marketId,
     isLong,
     amount,
-}: CreateOfferArgs) => {
-    const amountInYocto = utils.format.parseNearAmount(amount.toString());
-
-    if (!amountInYocto) throw Error("cannot parse near amount");
-
+}: {
+    selector: WalletSelector;
+    accountId: string;
+    marketId: number;
+    isLong: boolean;
+    amount: string;
+}) => {
     callMethod({
         selector,
         accountId,
         contractId: env.NEXT_PUBLIC_MKTPLC_CONTRACT,
         method: "create_offer",
-        args: { market_id: marketId, is_long: isLong, amount: amountInYocto },
-        partialOptions: { deposit: amountInYocto },
+        args: { market_id: marketId, is_long: isLong, amount: amount },
+        partialOptions: { deposit: amount },
     });
 };
 
-/**
- * Mutation hook for `createOffer`
- */
 const useCreateOffer = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (createOfferArgs: CreateOfferArgs) =>
-            createOffer(createOfferArgs),
+        mutationFn: createOffer,
         onSuccess: (_, vars) => {
-            queryClient.invalidateQueries({ queryKey: ["get-offers"] });
             queryClient.invalidateQueries({
                 queryKey: ["get-offers", vars.marketId],
             });
@@ -220,9 +154,6 @@ const useCreateOffer = () => {
     });
 };
 
-/**
- * Calls `accept_offer` method on the Marketplace smart contract
- */
 const acceptOffer = async ({
     selector,
     accountId,
@@ -232,25 +163,24 @@ const acceptOffer = async ({
     selector: WalletSelector;
     accountId: string;
     offerId: number;
-    amount: number;
+    amount: string;
 }) => {
-    const amountInYocto = utils.format.parseNearAmount(amount.toString());
-
-    if (!amountInYocto) throw Error("cannot parse near amount");
-
     callMethod({
         selector,
         accountId,
         contractId: env.NEXT_PUBLIC_MKTPLC_CONTRACT,
         method: "accept_offer",
         args: { offer_id: offerId },
-        partialOptions: { deposit: amountInYocto },
+        partialOptions: { deposit: amount },
     });
 };
 
-/**
- * Calls `cancel_offer` method on the Marketplace smart contract
- */
+const useAcceptOffer = () => {
+    return useMutation({
+        mutationFn: acceptOffer,
+    });
+};
+
 const cancelOffer = async ({
     selector,
     accountId,
@@ -269,10 +199,12 @@ const cancelOffer = async ({
     });
 };
 
-/**
- * Transfers FT from account to marketplace
- * Rewards are distributed according to result and FT transferred
- */
+const useCancelOffer = () => {
+    return useMutation({
+        mutationFn: cancelOffer,
+    });
+};
+
 const transferTokens = async () => {};
 
 export {
@@ -280,11 +212,12 @@ export {
     cancelOffer,
     closeMarket,
     transferTokens,
+    useAcceptOffer,
+    useCancelOffer,
     useCloseMarket,
     useCreateMarket,
     useCreateOffer,
     useGetMarketById,
     useGetMarkets,
-    useGetOffers,
     useGetOffersByMarketId,
 };
