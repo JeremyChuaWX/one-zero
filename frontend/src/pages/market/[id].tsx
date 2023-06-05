@@ -1,3 +1,4 @@
+import CloseMarketModal from "@/components/close-market-modal";
 import CreateOfferModal from "@/components/create-offer-modal";
 import OfferCard from "@/components/offer-card";
 import { useWalletSelector } from "@/contexts/wallet-selector-context";
@@ -9,7 +10,6 @@ import {
 import {
     Badge,
     Box,
-    Button,
     Card,
     CardBody,
     CardHeader,
@@ -42,13 +42,59 @@ const MarketPage = () => {
 
     return (
         <Box display="flex" flexDir="column" gap="4">
-            <MarketInfo market={market} />
-            <MarketOffers market={market} />
+            <MarketInfoCard market={market} />
+            <MarketOffersList market={market} />
         </Box>
     );
 };
 
-const MarketOffers = ({ market }: { market: Market }) => {
+const MarketInfoCard = ({ market }: { market: Market }) => {
+    const { accountId } = useWalletSelector();
+
+    const isOwner = accountId === market.owner_id;
+
+    return (
+        <Card display="flex" variant="outline">
+            <CardHeader
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+            >
+                <Box display="flex" gap="2" alignItems="center">
+                    <Heading size="md" textTransform="uppercase">
+                        Market {market.id}
+                    </Heading>
+                    <Badge
+                        colorScheme={market.is_closed ? "red" : "green"}
+                        fontSize="md"
+                        fontWeight="bold"
+                        height="max-content"
+                    >
+                        {market.is_closed ? "Closed" : "Open"}
+                    </Badge>
+                </Box>
+                {isOwner && <CloseMarketModal />}
+            </CardHeader>
+
+            <CardBody>
+                <Stack divider={<StackDivider />} spacing="4">
+                    {Object.keys(market).filter((value) =>
+                        !["id", "is_closed", "is_long"].includes(value)
+                    ).map((key) => (
+                        <Box key={key}>
+                            <Heading size="xs" textTransform="uppercase">
+                                {key}
+                            </Heading>
+                            <Text>{market[key as keyof Market]}</Text>
+                        </Box>
+                    ))}
+                </Stack>
+            </CardBody>
+        </Card>
+    );
+};
+
+const MarketOffersList = ({ market }: { market: Market }) => {
     const { accountId, selector } = useWalletSelector();
 
     const { data: offers, isLoading } = useGetOffersByMarketId(
@@ -80,58 +126,12 @@ const MarketOffers = ({ market }: { market: Market }) => {
                     <OfferCard
                         key={idx}
                         offer={offer}
-                        isOwner={accountId === market.owner_id}
-                        isAccount={accountId === offer.account_id}
+                        acceptEnabled={(accountId !== market.owner_id) &&
+                            (accountId !== offer.account_id)}
                     />
                 ))}
             </Box>
         </Box>
-    );
-};
-
-const MarketInfo = ({ market }: { market: Market }) => {
-    const { accountId } = useWalletSelector();
-
-    return (
-        <Card display="flex" variant="outline">
-            <CardHeader
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between"
-            >
-                <Box display="flex" gap="4" alignItems="center">
-                    <Heading size="md" textTransform="uppercase">
-                        Market {market.id}
-                    </Heading>
-                    <Badge
-                        colorScheme={market.is_closed ? "red" : "green"}
-                        fontSize="md"
-                        fontWeight="bold"
-                        height="max-content"
-                    >
-                        {market.is_closed ? "Closed" : "Open"}
-                    </Badge>
-                </Box>
-                {accountId === market.owner_id && (
-                    <Button variant="outline">Close Market</Button>
-                )}
-            </CardHeader>
-
-            <CardBody>
-                <Stack divider={<StackDivider />} spacing="4">
-                    {Object.keys(market).filter((value) =>
-                        !["id", "is_closed", "is_long"].includes(value)
-                    ).map((key) => (
-                        <Box key={key}>
-                            <Heading size="xs" textTransform="uppercase">
-                                {key}
-                            </Heading>
-                            <Text>{market[key as keyof Market]}</Text>
-                        </Box>
-                    ))}
-                </Stack>
-            </CardBody>
-        </Card>
     );
 };
 
