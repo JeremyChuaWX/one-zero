@@ -47,7 +47,9 @@ const Offers = ({ marketId }: { marketId: number }) => {
     return (
         <Box display="flex" flexDir="column" gap="4">
             <Box display="flex" justifyContent="space-between">
-                <Heading size="md">Offers</Heading>
+                <Heading size="md" textTransform="uppercase">
+                    Offers
+                </Heading>
                 <CreateOfferModal marketId={marketId} />
             </Box>
         </Box>

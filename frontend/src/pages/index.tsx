@@ -16,7 +16,9 @@ const Home = () => {
                 alignItems="center"
                 justifyContent="space-between"
             >
-                <Heading size="md">Markets</Heading>
+                <Heading size="md" textTransform="uppercase">
+                    Markets
+                </Heading>
                 <CreateMarketModal />
             </Box>
 
