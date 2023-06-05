@@ -5,7 +5,7 @@ import { Box, Heading, Spinner } from "@chakra-ui/react";
 import CreateMarketModal from "@/components/create-market-modal";
 
 const Home = () => {
-    const { selector } = useWalletSelector();
+    const { accountId, selector } = useWalletSelector();
 
     const { data: markets, isLoading } = useGetMarkets(selector);
 
@@ -19,7 +19,7 @@ const Home = () => {
                 <Heading size="md" textTransform="uppercase">
                     Markets
                 </Heading>
-                <CreateMarketModal />
+                <CreateMarketModal disabled={!accountId} />
             </Box>
 
             <Box display="flex" flexDir="column">

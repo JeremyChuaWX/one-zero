@@ -125,7 +125,7 @@ const MarketOffersList = ({ market }: { market: Market }) => {
                 </Heading>
                 <CreateOfferModal
                     marketId={market.id}
-                    disabled={market.is_closed}
+                    disabled={market.is_closed || !accountId}
                 />
             </Box>
             <Box display="flex" flexDir="column">
@@ -133,7 +133,8 @@ const MarketOffersList = ({ market }: { market: Market }) => {
                     <OfferCard
                         key={idx}
                         offer={offer}
-                        acceptDisabled={(accountId === market.owner_id) ||
+                        acceptDisabled={!accountId ||
+                            (accountId === market.owner_id) ||
                             (accountId === offer.account_id)}
                     />
                 ))}
