@@ -50,12 +50,6 @@ const useGetMarkets = (selector: WalletSelector) => {
     });
 };
 
-type CreateMarketArgs = {
-    selector: WalletSelector;
-    accountId: string;
-    description: string;
-};
-
 /**
  * Calls `create_market` method on the Marketplace smart contract
  */
@@ -63,7 +57,11 @@ const createMarket = async ({
     selector,
     accountId,
     description,
-}: CreateMarketArgs) => {
+}: {
+    selector: WalletSelector;
+    accountId: string;
+    description: string;
+}) => {
     callMethod({
         selector,
         accountId,
@@ -81,8 +79,7 @@ const useCreateMarket = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (createMarketArgs: CreateMarketArgs) =>
-            createMarket(createMarketArgs),
+        mutationFn: createMarket,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["get-markets"] });
         },
@@ -113,7 +110,19 @@ const closeMarket = async ({
     });
 };
 
-// TODO: mutation hook for close market
+/**
+ * Mutation hook for `closeMarket`
+ */
+const useCloseMarket = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: closeMarket,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["get-markets"] });
+        },
+    });
+};
 
 /**
  * Calls `list_offers` method on the Marketplace smart contract
@@ -271,6 +280,7 @@ export {
     cancelOffer,
     closeMarket,
     transferTokens,
+    useCloseMarket,
     useCreateMarket,
     useCreateOffer,
     useGetMarketById,
