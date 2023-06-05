@@ -3,13 +3,13 @@ import { setupWalletSelector } from "@near-wallet-selector/core";
 import type { WalletSelectorModal } from "@near-wallet-selector/modal-ui";
 import { setupModal } from "@near-wallet-selector/modal-ui";
 import { setupNearWallet } from "@near-wallet-selector/near-wallet";
-import type { ReactNode, FC } from "react";
+import type { FC, ReactNode } from "react";
 import {
+    createContext,
     useCallback,
     useContext,
     useEffect,
     useState,
-    createContext,
 } from "react";
 import { distinctUntilChanged, map } from "rxjs";
 
@@ -31,7 +31,7 @@ interface WalletSelectorContextValue {
 }
 
 const WalletSelectorContext = createContext<WalletSelectorContextValue | null>(
-    null
+    null,
 );
 
 const WalletSelectorContextProvider: FC<{
@@ -75,7 +75,7 @@ const WalletSelectorContextProvider: FC<{
         const subscription = selector.store.observable
             .pipe(
                 map((state) => state.accounts),
-                distinctUntilChanged()
+                distinctUntilChanged(),
             )
             .subscribe((nextAccounts) => {
                 console.log("Accounts Update", nextAccounts);
@@ -97,8 +97,8 @@ const WalletSelectorContextProvider: FC<{
         return <Loading />;
     }
 
-    const accountId =
-        accounts.find((account) => account.active)?.accountId || null;
+    const accountId = accounts.find((account) => account.active)?.accountId ||
+        null;
 
     return (
         <WalletSelectorContext.Provider
@@ -119,11 +119,11 @@ const useWalletSelector = () => {
 
     if (!context) {
         throw new Error(
-            "useWalletSelector must be used within a WalletSelectorContextProvider"
+            "useWalletSelector must be used within a WalletSelectorContextProvider",
         );
     }
 
     return context;
 };
 
-export { WalletSelectorContextProvider, useWalletSelector };
+export { useWalletSelector, WalletSelectorContextProvider };
