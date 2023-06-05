@@ -24,7 +24,7 @@ const MarketPage = () => {
     }
 
     return (
-        <>
+        <Box display="flex" flexDir="column" gap="4">
             <Box>
                 {market !== undefined &&
                     Object.entries(market).map(([key, value]) => (
@@ -34,7 +34,7 @@ const MarketPage = () => {
                     ))}
             </Box>
             <CreateOfferModal marketId={market.id} />
-        </>
+        </Box>
     );
 };
 
