@@ -1,6 +1,7 @@
 import { useWalletSelector } from "@/contexts/wallet-selector-context";
 import { useCreateOffer } from "@/utils/contract-methods";
 import {
+    Box,
     Button,
     ButtonGroup,
     FormControl,
@@ -77,28 +78,30 @@ const CreateOfferModal = ({ marketId }: { marketId: number }) => {
                             id="create-offer-form"
                             onSubmit={createOfferOnSumbit}
                         >
-                            <FormControl isRequired>
-                                <FormLabel>Amount Offered</FormLabel>
-                                <NumberInput min={1}>
-                                    <NumberInputField
-                                        {...register("amount")}
-                                        placeholder="Enter amount offered here"
+                            <Box display="flex" flexDir="column" gap="4">
+                                <FormControl isRequired>
+                                    <FormLabel>Amount Offered</FormLabel>
+                                    <NumberInput min={1}>
+                                        <NumberInputField
+                                            {...register("amount")}
+                                            placeholder="Enter amount offered here"
+                                        />
+
+                                        <NumberInputStepper>
+                                            <NumberIncrementStepper />
+                                            <NumberDecrementStepper />
+                                        </NumberInputStepper>
+                                    </NumberInput>
+                                </FormControl>
+
+                                <FormControl>
+                                    <FormLabel>Is the offer long?</FormLabel>
+                                    <Switch
+                                        {...register("isLong")}
+                                        placeholder="Enter market description here"
                                     />
-
-                                    <NumberInputStepper>
-                                        <NumberIncrementStepper />
-                                        <NumberDecrementStepper />
-                                    </NumberInputStepper>
-                                </NumberInput>
-                            </FormControl>
-
-                            <FormControl isRequired>
-                                <FormLabel>Is the offer long?</FormLabel>
-                                <Switch
-                                    {...register("isLong")}
-                                    placeholder="Enter market description here"
-                                />
-                            </FormControl>
+                                </FormControl>
+                            </Box>
                         </form>
                     </ModalBody>
 
