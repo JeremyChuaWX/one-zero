@@ -9,6 +9,7 @@ import {
 import {
     Badge,
     Box,
+    Button,
     Card,
     CardBody,
     CardHeader,
@@ -74,9 +75,10 @@ const MarketOffers = ({ market }: { market: Market }) => {
                     disabled={market.is_closed}
                 />
             </Box>
-            <Box display="flex" flexDir="column" gap="4">
-                {offers.map((offer) => (
+            <Box display="flex" flexDir="column">
+                {offers.map((offer, idx) => (
                     <OfferCard
+                        key={idx}
                         offer={offer}
                         isOwner={accountId === market.owner_id}
                         isAccount={accountId === offer.account_id}
@@ -88,20 +90,31 @@ const MarketOffers = ({ market }: { market: Market }) => {
 };
 
 const MarketInfo = ({ market }: { market: Market }) => {
+    const { accountId } = useWalletSelector();
+
     return (
         <Card display="flex" variant="outline">
-            <CardHeader display="flex" gap="4" alignItems="center">
-                <Heading size="md" textTransform="uppercase">
-                    Market {market.id}
-                </Heading>
-                <Badge
-                    colorScheme={market.is_closed ? "red" : "green"}
-                    fontSize="md"
-                    fontWeight="bold"
-                    height="max-content"
-                >
-                    {market.is_closed ? "Closed" : "Open"}
-                </Badge>
+            <CardHeader
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+            >
+                <Box display="flex" gap="4" alignItems="center">
+                    <Heading size="md" textTransform="uppercase">
+                        Market {market.id}
+                    </Heading>
+                    <Badge
+                        colorScheme={market.is_closed ? "red" : "green"}
+                        fontSize="md"
+                        fontWeight="bold"
+                        height="max-content"
+                    >
+                        {market.is_closed ? "Closed" : "Open"}
+                    </Badge>
+                </Box>
+                {accountId === market.owner_id && (
+                    <Button variant="outline">Close Market</Button>
+                )}
             </CardHeader>
 
             <CardBody>
@@ -109,7 +122,7 @@ const MarketInfo = ({ market }: { market: Market }) => {
                     {Object.keys(market).filter((value) =>
                         !["id", "is_closed", "is_long"].includes(value)
                     ).map((key) => (
-                        <Box>
+                        <Box key={key}>
                             <Heading size="xs" textTransform="uppercase">
                                 {key}
                             </Heading>
