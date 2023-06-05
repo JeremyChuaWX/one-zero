@@ -1,3 +1,5 @@
+import { useWalletSelector } from "@/contexts/wallet-selector-context";
+import { useCloseMarket } from "@/utils/contract-methods";
 import {
     Button,
     ButtonGroup,
@@ -9,16 +11,38 @@ import {
     ModalHeader,
     ModalOverlay,
     useDisclosure,
+    useToast,
 } from "@chakra-ui/react";
 import { MouseEventHandler } from "react";
 
-const CloseMarketModal = () => {
+const CloseMarketModal = ({ marketId }: { marketId: number }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
-    // const {} = useCloseMarket();
+    const toast = useToast();
+
+    const { accountId, selector } = useWalletSelector();
+
+    const { mutate: closeMarket } = useCloseMarket();
 
     const closeMarketOnClick: MouseEventHandler<HTMLButtonElement> = (e) => {
         e.preventDefault();
+
+        if (accountId === null) {
+            toast({
+                status: "error",
+                description: "No wallet connected",
+                isClosable: true,
+                position: "bottom-right",
+            });
+            return;
+        }
+
+        closeMarket({
+            selector,
+            accountId,
+            marketId,
+            isLong: true,
+        });
     };
 
     return (
