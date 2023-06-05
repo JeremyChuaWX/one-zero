@@ -113,6 +113,8 @@ const closeMarket = async ({
     });
 };
 
+// TODO: mutation hook for close market
+
 /**
  * Calls `list_offers` method on the Marketplace smart contract
  */
@@ -200,8 +202,11 @@ const useCreateOffer = () => {
     return useMutation({
         mutationFn: (createOfferArgs: CreateOfferArgs) =>
             createOffer(createOfferArgs),
-        onSuccess: () => {
+        onSuccess: (_, vars) => {
             queryClient.invalidateQueries({ queryKey: ["get-offers"] });
+            queryClient.invalidateQueries({
+                queryKey: ["get-offers", vars.marketId],
+            });
         },
     });
 };
