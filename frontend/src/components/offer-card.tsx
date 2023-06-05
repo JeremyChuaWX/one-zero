@@ -3,11 +3,7 @@ import type { Offer } from "@/types";
 import { formatNearAmount } from "near-api-js/lib/utils/format";
 
 const OfferCard = (
-    { offer, isAccount, isOwner }: {
-        offer: Offer;
-        isAccount: boolean;
-        isOwner: boolean;
-    },
+    { offer, acceptEnabled }: { offer: Offer; acceptEnabled: boolean },
 ) => {
     return (
         <Box
@@ -19,9 +15,9 @@ const OfferCard = (
             borderColor="gray.300"
             _last={{ borderBottom: 0 }}
         >
-            <Box>
+            <Box display="flex" alignItems="center" gap="2">
                 <Text>
-                    {formatNearAmount(offer.amount)}N
+                    {formatNearAmount(offer.amount)} NEAR
                 </Text>
                 <Badge
                     colorScheme={offer.is_long ? "green" : "yellow"}
@@ -30,12 +26,11 @@ const OfferCard = (
                     {offer.is_long ? "long" : "short"}
                 </Badge>
             </Box>
-            {!(isOwner || isAccount) &&
-                (
-                    <Button size="sm" isDisabled={isOwner || isAccount}>
-                        Accept Offer
-                    </Button>
-                )}
+            <Box opacity={acceptEnabled ? "100" : "0"}>
+                <Button size="sm" isDisabled={acceptEnabled}>
+                    Accept Offer
+                </Button>
+            </Box>
         </Box>
     );
 };
