@@ -12,7 +12,6 @@ const OfferCard = (
     return (
         <Box
             display="flex"
-            gap="4"
             alignItems="center"
             justifyContent="space-between"
             padding="4"
@@ -31,9 +30,12 @@ const OfferCard = (
                     {offer.is_long ? "long" : "short"}
                 </Badge>
             </Box>
-            <Button size="sm" isDisabled={isOwner || isAccount}>
-                Accept Offer
-            </Button>
+            {!(isOwner || isAccount) &&
+                (
+                    <Button size="sm" isDisabled={isOwner || isAccount}>
+                        Accept Offer
+                    </Button>
+                )}
         </Box>
     );
 };
