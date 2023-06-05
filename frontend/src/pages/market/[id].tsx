@@ -41,12 +41,12 @@ const MarketPage = () => {
     return (
         <Box display="flex" flexDir="column" gap="4">
             <MarketInfo market={market} />
-            <Offers market={market} />
+            <MarketOffers market={market} />
         </Box>
     );
 };
 
-const Offers = ({ market }: { market: Market }) => {
+const MarketOffers = ({ market }: { market: Market }) => {
     const { selector } = useWalletSelector();
 
     const { data: offers, isLoading } = useGetOffersByMarketId(

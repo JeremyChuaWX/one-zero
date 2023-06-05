@@ -2,9 +2,7 @@ import { Box, Link } from "@chakra-ui/react";
 import type { Market } from "@/types";
 import NextLink from "next/link";
 
-type MarketCardProps = { market: Market };
-
-const MarketCard = ({ market }: MarketCardProps) => {
+const MarketCard = ({ market }: { market: Market }) => {
     return (
         <Box
             padding="4"
