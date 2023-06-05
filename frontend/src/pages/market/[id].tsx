@@ -112,7 +112,11 @@ const MarketOffersList = ({ market }: { market: Market }) => {
 
     return (
         <Box display="flex" flexDir="column" gap="4">
-            <Box display="flex" justifyContent="space-between">
+            <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+            >
                 <Heading size="md" textTransform="uppercase">
                     Offers
                 </Heading>
