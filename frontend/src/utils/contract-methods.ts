@@ -22,11 +22,12 @@ const getMarketById = async (selector: WalletSelector, marketId: number) => {
 /**
  * Query hook for `getMarketById`
  */
-const useGetMarketById = (selector: WalletSelector, marketId: number) =>
-    useQuery({
+const useGetMarketById = (selector: WalletSelector, marketId: number) => {
+    return useQuery({
         queryKey: ["get-market", marketId],
         queryFn: () => getMarketById(selector, marketId),
     });
+};
 
 /**
  * Calls `list_markets` method on the Marketplace smart contract
@@ -42,11 +43,12 @@ const getMarkets = async (selector: WalletSelector) => {
 /**
  * Query hook for `getMarkets`
  */
-const useGetMarkets = (selector: WalletSelector) =>
-    useQuery({
+const useGetMarkets = (selector: WalletSelector) => {
+    return useQuery({
         queryKey: ["get-markets"],
         queryFn: () => getMarkets(selector),
     });
+};
 
 type CreateMarketArgs = {
     selector: WalletSelector;
@@ -126,9 +128,34 @@ const getOffers = async (selector: WalletSelector) => {
  * Query hook for `getOffers`
  */
 const useGetOffers = (selector: WalletSelector) => {
-    useQuery({
+    return useQuery({
         queryKey: ["get-offers"],
         queryFn: () => getOffers(selector),
+    });
+};
+
+/**
+ * Calls `list_offers_by_market` method on the Marketplace smart contract
+ */
+const getOffersByMarketId = async (
+    selector: WalletSelector,
+    marketId: number,
+) => {
+    return (await viewMethod({
+        selector,
+        contractId: env.NEXT_PUBLIC_MKTPLC_CONTRACT,
+        method: "list_offers_by_market",
+        args: { market_id: marketId },
+    })) as Offer[];
+};
+
+/**
+ * Query hook for `getOffersByMarketId`
+ */
+const useGetOffersByMarketId = (selector: WalletSelector, marketId: number) => {
+    return useQuery({
+        queryKey: ["get-offers", marketId],
+        queryFn: () => getOffersByMarketId(selector, marketId),
     });
 };
 
@@ -235,13 +262,14 @@ const cancelOffer = async ({
 const transferTokens = async () => {};
 
 export {
-    useGetMarkets,
-    useGetMarketById,
-    useCreateMarket,
-    closeMarket,
-    useGetOffers,
-    useCreateOffer,
     acceptOffer,
     cancelOffer,
+    closeMarket,
     transferTokens,
+    useCreateMarket,
+    useCreateOffer,
+    useGetMarketById,
+    useGetMarkets,
+    useGetOffers,
+    useGetOffersByMarketId,
 };
