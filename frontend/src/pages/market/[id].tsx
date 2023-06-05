@@ -73,7 +73,7 @@ const MarketInfoCard = ({ market }: { market: Market }) => {
                         {market.is_closed ? "Closed" : "Open"}
                     </Badge>
                 </Box>
-                {isOwner && <CloseMarketModal />}
+                {isOwner && <CloseMarketModal marketId={market.id} />}
             </CardHeader>
 
             <CardBody>
