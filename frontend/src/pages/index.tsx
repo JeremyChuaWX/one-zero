@@ -23,7 +23,7 @@ const Home = () => {
             </Box>
 
             <Box display="flex" flexDir="column">
-                {isLoading
+                {(isLoading || !markets)
                     ? (
                         <Spinner
                             size="lg"
@@ -33,9 +33,11 @@ const Home = () => {
                         />
                     )
                     : (
-                        markets?.map((market, idx) => (
-                            <MarketCard market={market} key={idx} />
-                        ))
+                        markets.filter((value) => !value.is_closed).map(
+                            (market, idx) => (
+                                <MarketCard market={market} key={idx} />
+                            ),
+                        )
                     )}
             </Box>
         </Box>
