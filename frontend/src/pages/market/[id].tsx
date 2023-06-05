@@ -18,7 +18,7 @@ const MarketPage = () => {
     if (isLoading || !market) {
         return (
             <Box display="flex" justifyContent="center">
-                <Spinner size="xl" />
+                <Spinner size="lg" />
             </Box>
         );
     }
