@@ -113,7 +113,11 @@ const CreateOfferModal = (
                                 Close
                             </Button>
 
-                            <Button form="create-offer-form" type="submit">
+                            <Button
+                                form="create-offer-form"
+                                type="submit"
+                                colorScheme="green"
+                            >
                                 Create Offer
                             </Button>
                         </ButtonGroup>

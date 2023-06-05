@@ -86,7 +86,11 @@ const CreateMarketModal = () => {
                             <Button type="button" onClick={onClose}>
                                 Close
                             </Button>
-                            <Button form="create-market-form" type="submit">
+                            <Button
+                                form="create-market-form"
+                                type="submit"
+                                colorScheme="green"
+                            >
                                 Create Market
                             </Button>
                         </ButtonGroup>
