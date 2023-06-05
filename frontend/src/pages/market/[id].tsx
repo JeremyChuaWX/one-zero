@@ -1,7 +1,10 @@
 import CreateOfferModal from "@/components/create-offer-modal";
 import { useWalletSelector } from "@/contexts/wallet-selector-context";
 import { Market } from "@/types";
-import { useGetMarketById } from "@/utils/contract-methods";
+import {
+    useGetMarketById,
+    useGetOffersByMarketId,
+} from "@/utils/contract-methods";
 import {
     Badge,
     Box,
@@ -44,6 +47,21 @@ const MarketPage = () => {
 };
 
 const Offers = ({ market }: { market: Market }) => {
+    const { selector } = useWalletSelector();
+
+    const { data: offers, isLoading } = useGetOffersByMarketId(
+        selector,
+        market.id,
+    );
+
+    if (isLoading || !offers) {
+        return (
+            <Box display="flex" justifyContent="center">
+                <Spinner size="lg" color="gray.300" />
+            </Box>
+        );
+    }
+
     return (
         <Box display="flex" flexDir="column" gap="4">
             <Box display="flex" justifyContent="space-between">
@@ -54,6 +72,14 @@ const Offers = ({ market }: { market: Market }) => {
                     marketId={market.id}
                     disabled={market.is_closed}
                 />
+            </Box>
+            <Box display="flex" flexDir="column" gap="4">
+                {offers.map((offer) => (
+                    <Text>
+                        {offer.account_id}: {offer.amount}{" "}
+                        ({offer.is_long ? "long" : "short"})
+                    </Text>
+                ))}
             </Box>
         </Box>
     );
