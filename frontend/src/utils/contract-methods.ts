@@ -6,19 +6,19 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const FIVE_NEAR = "5000000000000000000000000";
 
-const getMarketById = async (selector: WalletSelector, marketId: number) => {
+const getMarket = async (selector: WalletSelector, market: Market) => {
     return (await viewMethod({
         selector,
         contractId: env.NEXT_PUBLIC_MKTPLC_CONTRACT,
         method: "get_market",
-        args: { market_id: marketId },
+        args: { market_id: market.id },
     })) as Market;
 };
 
-const useGetMarketById = (selector: WalletSelector, marketId: number) => {
+const useGetMarket = (selector: WalletSelector, market: Market) => {
     return useQuery({
-        queryKey: ["get-market", marketId],
-        queryFn: () => getMarketById(selector, marketId),
+        queryKey: ["get-market", market.id],
+        queryFn: () => getMarket(selector, market),
     });
 };
 
@@ -67,23 +67,20 @@ const useCreateMarket = () => {
     });
 };
 
-const closeMarket = async ({
-    selector,
-    accountId,
-    marketId,
-    isLong,
-}: {
-    selector: WalletSelector;
-    accountId: string;
-    marketId: number;
-    isLong: boolean;
-}) => {
+const closeMarket = async (
+    { selector, accountId, market, isLong }: {
+        selector: WalletSelector;
+        accountId: string;
+        market: Market;
+        isLong: boolean;
+    },
+) => {
     callMethod({
         selector,
         accountId,
         contractId: env.NEXT_PUBLIC_MKTPLC_CONTRACT,
         method: "close_market",
-        args: { market_id: marketId, is_long: isLong },
+        args: { market_id: market.id, is_long: isLong },
         partialOptions: {},
     });
 };
@@ -99,35 +96,32 @@ const useCloseMarket = () => {
     });
 };
 
-const getOffersByMarketId = async (
-    selector: WalletSelector,
-    marketId: number,
-) => {
+const getOffersByMarket = async (selector: WalletSelector, market: Market) => {
     return (await viewMethod({
         selector,
         contractId: env.NEXT_PUBLIC_MKTPLC_CONTRACT,
         method: "list_offers_by_market",
-        args: { market_id: marketId },
+        args: { market_id: market.id },
     })) as Offer[];
 };
 
-const useGetOffersByMarketId = (selector: WalletSelector, marketId: number) => {
+const useGetOffersByMarket = (selector: WalletSelector, market: Market) => {
     return useQuery({
-        queryKey: ["get-offers", marketId],
-        queryFn: () => getOffersByMarketId(selector, marketId),
+        queryKey: ["get-offers", market.id],
+        queryFn: () => getOffersByMarket(selector, market),
     });
 };
 
 const createOffer = async ({
     selector,
     accountId,
-    marketId,
+    market,
     isLong,
     amount,
 }: {
     selector: WalletSelector;
     accountId: string;
-    marketId: number;
+    market: Market;
     isLong: boolean;
     amount: string;
 }) => {
@@ -136,7 +130,7 @@ const createOffer = async ({
         accountId,
         contractId: env.NEXT_PUBLIC_MKTPLC_CONTRACT,
         method: "create_offer",
-        args: { market_id: marketId, is_long: isLong, amount: amount },
+        args: { market_id: market.id, is_long: isLong, amount: amount },
         partialOptions: { deposit: amount },
     });
 };
@@ -148,7 +142,7 @@ const useCreateOffer = () => {
         mutationFn: createOffer,
         onSuccess: (_, vars) => {
             queryClient.invalidateQueries({
-                queryKey: ["get-offers", vars.marketId],
+                queryKey: ["get-offers", vars.market.id],
             });
         },
     });
@@ -157,12 +151,12 @@ const useCreateOffer = () => {
 const acceptOffer = async ({
     selector,
     accountId,
-    offerId,
+    offer,
     amount,
 }: {
     selector: WalletSelector;
     accountId: string;
-    offerId: number;
+    offer: Offer;
     amount: string;
 }) => {
     callMethod({
@@ -170,7 +164,7 @@ const acceptOffer = async ({
         accountId,
         contractId: env.NEXT_PUBLIC_MKTPLC_CONTRACT,
         method: "accept_offer",
-        args: { offer_id: offerId },
+        args: { offer_id: offer.id },
         partialOptions: { deposit: amount },
     });
 };
@@ -184,24 +178,31 @@ const useAcceptOffer = () => {
 const cancelOffer = async ({
     selector,
     accountId,
-    offerId,
+    offer,
 }: {
     selector: WalletSelector;
     accountId: string;
-    offerId: number;
+    offer: Offer;
 }) => {
     callMethod({
         selector,
         accountId,
         contractId: env.NEXT_PUBLIC_MKTPLC_CONTRACT,
         method: "cancel_offer",
-        args: { offer_id: offerId },
+        args: { offer_id: offer.id },
     });
 };
 
 const useCancelOffer = () => {
+    const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: cancelOffer,
+        onSuccess: (_, vars) => {
+            queryClient.invalidateQueries({
+                queryKey: ["get-market", vars.offer.market_id],
+            });
+        },
     });
 };
 
@@ -217,7 +218,7 @@ export {
     useCloseMarket,
     useCreateMarket,
     useCreateOffer,
-    useGetMarketById,
+    useGetMarket,
     useGetMarkets,
-    useGetOffersByMarketId,
+    useGetOffersByMarket,
 };
