@@ -2,11 +2,13 @@
 
 ## How to use
 
-Install all dependencies before starting (check all `Cargo.toml` and `package.json` files).
+Install all dependencies before starting (check all `Cargo.toml` and
+`package.json` files).
 
 ### Deploy contracts on testnet
 
-Run the dev deploy script with root directory as `./contract` to build the contracts (might need to build twice as marketplace includes bytes of token).
+Run the dev deploy script with root directory as `./contract` to build the
+contracts (might need to build twice as marketplace includes bytes of token).
 
 ```sh
 cd contract
