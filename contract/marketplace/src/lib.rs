@@ -307,6 +307,10 @@ impl Marketplace {
             "Cannot create an offer on a closed market"
         );
         require!(
+            market.owner_id != account,
+            "Cannot create an offer on a market you own"
+        );
+        require!(
             attached_deposit >= self.add_offer_storage_stake(Balance::from(amount)),
             "Insufficient attached balance"
         );
