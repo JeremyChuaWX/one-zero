@@ -6,19 +6,19 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const FIVE_NEAR = "5000000000000000000000000";
 
-const getMarket = async (selector: WalletSelector, market: Market) => {
+const getMarket = async (selector: WalletSelector, marketId: number) => {
     return (await viewMethod({
         selector,
         contractId: env.NEXT_PUBLIC_MKTPLC_CONTRACT,
         method: "get_market",
-        args: { market_id: market.id },
+        args: { market_id: marketId },
     })) as Market;
 };
 
-const useGetMarket = (selector: WalletSelector, market: Market) => {
+const useGetMarket = (selector: WalletSelector, marketId: number) => {
     return useQuery({
-        queryKey: ["get-market", market.id],
-        queryFn: () => getMarket(selector, market),
+        queryKey: ["get-market", marketId],
+        queryFn: () => getMarket(selector, marketId),
     });
 };
 
@@ -90,8 +90,11 @@ const useCloseMarket = () => {
 
     return useMutation({
         mutationFn: closeMarket,
-        onSuccess: () => {
+        onSuccess: (_, vars) => {
             queryClient.invalidateQueries({ queryKey: ["get-markets"] });
+            queryClient.invalidateQueries({
+                queryKey: ["get-market", vars.market.id],
+            });
         },
     });
 };
@@ -142,22 +145,16 @@ const useCreateOffer = () => {
         mutationFn: createOffer,
         onSuccess: (_, vars) => {
             queryClient.invalidateQueries({
-                queryKey: ["get-offers", vars.market.id],
+                queryKey: ["get-market", vars.market.id],
             });
         },
     });
 };
 
-const acceptOffer = async ({
-    selector,
-    accountId,
-    offer,
-    amount,
-}: {
+const acceptOffer = async ({ selector, accountId, offer }: {
     selector: WalletSelector;
     accountId: string;
     offer: Offer;
-    amount: string;
 }) => {
     callMethod({
         selector,
@@ -165,21 +162,24 @@ const acceptOffer = async ({
         contractId: env.NEXT_PUBLIC_MKTPLC_CONTRACT,
         method: "accept_offer",
         args: { offer_id: offer.id },
-        partialOptions: { deposit: amount },
+        partialOptions: { deposit: offer.amount },
     });
 };
 
 const useAcceptOffer = () => {
+    const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: acceptOffer,
+        onSuccess: (_, vars) => {
+            queryClient.invalidateQueries({
+                queryKey: ["get-market", vars.offer.market_id],
+            });
+        },
     });
 };
 
-const cancelOffer = async ({
-    selector,
-    accountId,
-    offer,
-}: {
+const cancelOffer = async ({ selector, accountId, offer }: {
     selector: WalletSelector;
     accountId: string;
     offer: Offer;
