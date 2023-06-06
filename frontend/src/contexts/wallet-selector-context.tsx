@@ -32,7 +32,7 @@ interface WalletSelectorContextValue {
 }
 
 const WalletSelectorContext = createContext<WalletSelectorContextValue | null>(
-    null,
+    null
 );
 
 const WalletSelectorContextProvider: FC<{
@@ -76,7 +76,7 @@ const WalletSelectorContextProvider: FC<{
         const subscription = selector.store.observable
             .pipe(
                 map((state) => state.accounts),
-                distinctUntilChanged(),
+                distinctUntilChanged()
             )
             .subscribe((nextAccounts) => {
                 console.log("Accounts Update", nextAccounts);
@@ -98,8 +98,8 @@ const WalletSelectorContextProvider: FC<{
         return <Loading />;
     }
 
-    const accountId = accounts.find((account) => account.active)?.accountId ||
-        null;
+    const accountId =
+        accounts.find((account) => account.active)?.accountId || null;
 
     return (
         <WalletSelectorContext.Provider
@@ -120,7 +120,7 @@ const useWalletSelector = () => {
 
     if (!context) {
         throw new Error(
-            "useWalletSelector must be used within a WalletSelectorContextProvider",
+            "useWalletSelector must be used within a WalletSelectorContextProvider"
         );
     }
 

@@ -26,7 +26,7 @@ const MarketPage = () => {
 
     const { data: market, isLoading } = useGetMarket(
         selector,
-        parseInt(id as string),
+        parseInt(id as string)
     );
 
     if (isLoading || !market) {
@@ -78,16 +78,19 @@ const MarketInfoCard = ({ market }: { market: Market }) => {
 
             <CardBody>
                 <Stack divider={<StackDivider />} spacing="4">
-                    {Object.keys(market).filter((value) =>
-                        !["id", "is_closed", "is_long"].includes(value)
-                    ).map((key) => (
-                        <Box key={key}>
-                            <Heading size="xs" textTransform="uppercase">
-                                {key}
-                            </Heading>
-                            <Text>{market[key as keyof Market]}</Text>
-                        </Box>
-                    ))}
+                    {Object.keys(market)
+                        .filter(
+                            (value) =>
+                                !["id", "is_closed", "is_long"].includes(value)
+                        )
+                        .map((key) => (
+                            <Box key={key}>
+                                <Heading size="xs" textTransform="uppercase">
+                                    {key}
+                                </Heading>
+                                <Text>{market[key as keyof Market]}</Text>
+                            </Box>
+                        ))}
                 </Stack>
             </CardBody>
         </Card>
@@ -119,8 +122,11 @@ const MarketOffersList = ({ market }: { market: Market }) => {
                 </Heading>
                 <CreateOfferModal
                     market={market}
-                    disabled={market.is_closed || !accountId ||
-                        market.owner_id === accountId}
+                    disabled={
+                        market.is_closed ||
+                        !accountId ||
+                        market.owner_id === accountId
+                    }
                 />
             </Box>
             <Box display="flex" flexDir="column">
@@ -128,11 +134,17 @@ const MarketOffersList = ({ market }: { market: Market }) => {
                     <OfferCard
                         key={idx}
                         offer={offer}
-                        acceptDisabled={!accountId || (market.is_closed) ||
-                            (accountId === market.owner_id) ||
-                            (accountId === offer.account_id)}
-                        cancelDisabled={!accountId || (market.is_closed) ||
-                            (accountId !== offer.account_id)}
+                        acceptDisabled={
+                            !accountId ||
+                            market.is_closed ||
+                            accountId === market.owner_id ||
+                            accountId === offer.account_id
+                        }
+                        cancelDisabled={
+                            !accountId ||
+                            market.is_closed ||
+                            accountId !== offer.account_id
+                        }
                     />
                 ))}
             </Box>

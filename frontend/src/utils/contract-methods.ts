@@ -67,14 +67,17 @@ const useCreateMarket = () => {
     });
 };
 
-const closeMarket = async (
-    { selector, accountId, market, isLong }: {
-        selector: WalletSelector;
-        accountId: string;
-        market: Market;
-        isLong: boolean;
-    },
-) => {
+const closeMarket = async ({
+    selector,
+    accountId,
+    market,
+    isLong,
+}: {
+    selector: WalletSelector;
+    accountId: string;
+    market: Market;
+    isLong: boolean;
+}) => {
     callMethod({
         selector,
         accountId,
@@ -151,7 +154,11 @@ const useCreateOffer = () => {
     });
 };
 
-const acceptOffer = async ({ selector, accountId, offer }: {
+const acceptOffer = async ({
+    selector,
+    accountId,
+    offer,
+}: {
     selector: WalletSelector;
     accountId: string;
     offer: Offer;
@@ -179,7 +186,11 @@ const useAcceptOffer = () => {
     });
 };
 
-const cancelOffer = async ({ selector, accountId, offer }: {
+const cancelOffer = async ({
+    selector,
+    accountId,
+    offer,
+}: {
     selector: WalletSelector;
     accountId: string;
     offer: Offer;

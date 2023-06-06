@@ -27,9 +27,7 @@ const CreateMarketModal = ({ disabled }: { disabled: boolean }) => {
 
     const toast = useToast();
 
-    const { handleSubmit, register } = useForm<
-        CreateMarketFormInput
-    >();
+    const { handleSubmit, register } = useForm<CreateMarketFormInput>();
 
     const { selector, accountId } = useWalletSelector();
 

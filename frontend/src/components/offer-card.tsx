@@ -4,13 +4,15 @@ import { utils } from "near-api-js";
 import AcceptOfferModal from "./accept-offer-modal";
 import CancelOfferModal from "./cancel-offer-modal";
 
-const OfferCard = (
-    { offer, acceptDisabled, cancelDisabled }: {
-        offer: Offer;
-        acceptDisabled: boolean;
-        cancelDisabled: boolean;
-    },
-) => {
+const OfferCard = ({
+    offer,
+    acceptDisabled,
+    cancelDisabled,
+}: {
+    offer: Offer;
+    acceptDisabled: boolean;
+    cancelDisabled: boolean;
+}) => {
     return (
         <Box
             display="flex"

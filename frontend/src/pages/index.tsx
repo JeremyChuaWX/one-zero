@@ -23,22 +23,20 @@ const Home = () => {
             </Box>
 
             <Box display="flex" flexDir="column">
-                {(isLoading || !markets)
-                    ? (
-                        <Spinner
-                            size="lg"
-                            alignSelf="center"
-                            margin="4"
-                            color="gray.300"
-                        />
-                    )
-                    : (
-                        markets.filter((value) => !value.is_closed).map(
-                            (market, idx) => (
-                                <MarketCard market={market} key={idx} />
-                            ),
-                        )
-                    )}
+                {isLoading || !markets ? (
+                    <Spinner
+                        size="lg"
+                        alignSelf="center"
+                        margin="4"
+                        color="gray.300"
+                    />
+                ) : (
+                    markets
+                        .filter((value) => !value.is_closed)
+                        .map((market, idx) => (
+                            <MarketCard market={market} key={idx} />
+                        ))
+                )}
             </Box>
         </Box>
     );

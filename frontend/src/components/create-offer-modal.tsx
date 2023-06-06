@@ -31,9 +31,13 @@ type CreateOfferFormInput = {
     isLong: boolean;
 };
 
-const CreateOfferModal = (
-    { market, disabled }: { market: Market; disabled: boolean },
-) => {
+const CreateOfferModal = ({
+    market,
+    disabled,
+}: {
+    market: Market;
+    disabled: boolean;
+}) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const toast = useToast();

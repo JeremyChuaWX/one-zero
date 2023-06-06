@@ -22,12 +22,9 @@ const AuthButton = () => {
             <Button onClick={signInOnClick}>
                 {accountId ?? "Connect Wallet"}
             </Button>
-            {accountId !== null &&
-                (
-                    <Button onClick={signOutOnClick}>
-                        Sign Out
-                    </Button>
-                )}
+            {accountId !== null && (
+                <Button onClick={signOutOnClick}>Sign Out</Button>
+            )}
         </ButtonGroup>
     );
 };

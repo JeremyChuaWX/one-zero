@@ -16,9 +16,13 @@ import {
 } from "@chakra-ui/react";
 import { MouseEventHandler } from "react";
 
-const AcceptOfferModal = (
-    { offer, disabled }: { offer: Offer; disabled: boolean },
-) => {
+const AcceptOfferModal = ({
+    offer,
+    disabled,
+}: {
+    offer: Offer;
+    disabled: boolean;
+}) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const toast = useToast();
@@ -61,9 +65,7 @@ const AcceptOfferModal = (
                     <ModalHeader>Accept Offer</ModalHeader>
                     <ModalCloseButton />
 
-                    <ModalBody>
-                        Do you want to accept this offer?
-                    </ModalBody>
+                    <ModalBody>Do you want to accept this offer?</ModalBody>
 
                     <ModalFooter>
                         <ButtonGroup variant="outline">
