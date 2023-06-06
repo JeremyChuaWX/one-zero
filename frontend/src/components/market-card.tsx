@@ -8,7 +8,7 @@ const MarketCard = ({ market }: { market: Market }) => {
             display="flex"
             alignItems="center"
             justifyContent="space-between"
-            padding="4"
+            paddingY="4"
             borderBottom="1px"
             borderColor="gray.300"
             _last={{ borderBottom: 0 }}

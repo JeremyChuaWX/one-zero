@@ -3,10 +3,7 @@ import CreateOfferModal from "@/components/create-offer-modal";
 import OfferCard from "@/components/offer-card";
 import { useWalletSelector } from "@/contexts/wallet-selector-context";
 import { Market } from "@/types";
-import {
-    useGetMarketById,
-    useGetOffersByMarketId,
-} from "@/utils/contract-methods";
+import { useGetMarket, useGetOffersByMarket } from "@/utils/contract-methods";
 import {
     Badge,
     Box,
@@ -27,7 +24,7 @@ const MarketPage = () => {
 
     const { selector } = useWalletSelector();
 
-    const { data: market, isLoading } = useGetMarketById(
+    const { data: market, isLoading } = useGetMarket(
         selector,
         parseInt(id as string),
     );
@@ -74,7 +71,7 @@ const MarketInfoCard = ({ market }: { market: Market }) => {
                     </Badge>
                 </Box>
                 <CloseMarketModal
-                    marketId={market.id}
+                    market={market}
                     disabled={!isOwner || market.is_closed}
                 />
             </CardHeader>
@@ -100,10 +97,7 @@ const MarketInfoCard = ({ market }: { market: Market }) => {
 const MarketOffersList = ({ market }: { market: Market }) => {
     const { accountId, selector } = useWalletSelector();
 
-    const { data: offers, isLoading } = useGetOffersByMarketId(
-        selector,
-        market.id,
-    );
+    const { data: offers, isLoading } = useGetOffersByMarket(selector, market);
 
     if (isLoading || !offers) {
         return (
@@ -124,8 +118,9 @@ const MarketOffersList = ({ market }: { market: Market }) => {
                     Offers
                 </Heading>
                 <CreateOfferModal
-                    marketId={market.id}
-                    disabled={market.is_closed || !accountId}
+                    market={market}
+                    disabled={market.is_closed || !accountId ||
+                        market.owner_id === accountId}
                 />
             </Box>
             <Box display="flex" flexDir="column">
@@ -133,9 +128,11 @@ const MarketOffersList = ({ market }: { market: Market }) => {
                     <OfferCard
                         key={idx}
                         offer={offer}
-                        acceptDisabled={!accountId ||
+                        acceptDisabled={!accountId || (market.is_closed) ||
                             (accountId === market.owner_id) ||
                             (accountId === offer.account_id)}
+                        cancelDisabled={!accountId || (market.is_closed) ||
+                            (accountId !== offer.account_id)}
                     />
                 ))}
             </Box>

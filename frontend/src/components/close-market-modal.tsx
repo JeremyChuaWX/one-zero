@@ -1,4 +1,5 @@
 import { useWalletSelector } from "@/contexts/wallet-selector-context";
+import { Market } from "@/types";
 import { useCloseMarket } from "@/utils/contract-methods";
 import {
     Button,
@@ -23,7 +24,7 @@ type CloseMarketFormInput = {
 };
 
 const CloseMarketModal = (
-    { marketId, disabled }: { marketId: number; disabled: boolean },
+    { market, disabled }: { market: Market; disabled: boolean },
 ) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -46,12 +47,23 @@ const CloseMarketModal = (
             return;
         }
 
-        closeMarket({
-            selector,
-            accountId,
-            marketId,
-            isLong: input.isLong,
-        });
+        try {
+            closeMarket({
+                selector,
+                accountId,
+                market,
+                isLong: input.isLong,
+            });
+        } catch (err) {
+            toast({
+                status: "error",
+                description: "Error closing market",
+                isClosable: true,
+                position: "bottom-right",
+            });
+        }
+
+        onClose();
     });
 
     return (

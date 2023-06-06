@@ -24,6 +24,7 @@ import {
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { utils } from "near-api-js";
+import { Market } from "@/types";
 
 type CreateOfferFormInput = {
     amount: number;
@@ -31,7 +32,7 @@ type CreateOfferFormInput = {
 };
 
 const CreateOfferModal = (
-    { marketId, disabled }: { marketId: number; disabled: boolean },
+    { market, disabled }: { market: Market; disabled: boolean },
 ) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -69,7 +70,7 @@ const CreateOfferModal = (
         createOffer({
             selector,
             accountId,
-            marketId,
+            market,
             amount,
             isLong: input.isLong,
         });

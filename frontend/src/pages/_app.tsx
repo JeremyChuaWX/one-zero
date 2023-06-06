@@ -1,5 +1,5 @@
 import { WalletSelectorContextProvider } from "@/contexts/wallet-selector-context";
-import { Box, CSSReset, ChakraProvider } from "@chakra-ui/react";
+import { ChakraProvider, Container, CSSReset } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { AppProps } from "next/app";
 import Navbar from "@/components/navbar";
@@ -24,9 +24,9 @@ const App = ({ Component, pageProps }: AppProps) => {
                 <QueryClientProvider client={queryClient}>
                     <WalletSelectorContextProvider>
                         <Navbar />
-                        <Box as="main" width="70%" marginX="auto" marginTop="8">
+                        <Container as="main" marginTop="8">
                             <Component {...pageProps} />
-                        </Box>
+                        </Container>
                     </WalletSelectorContextProvider>
                 </QueryClientProvider>
             </ChakraProvider>

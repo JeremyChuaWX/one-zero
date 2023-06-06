@@ -1,6 +1,6 @@
 import { useWalletSelector } from "@/contexts/wallet-selector-context";
 import { Offer } from "@/types";
-import { useAcceptOffer } from "@/utils/contract-methods";
+import { useCancelOffer } from "@/utils/contract-methods";
 import {
     Button,
     ButtonGroup,
@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { MouseEventHandler } from "react";
 
-const AcceptOfferModal = (
+const CancelOfferModal = (
     { offer, disabled }: { offer: Offer; disabled: boolean },
 ) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -25,9 +25,9 @@ const AcceptOfferModal = (
 
     const { accountId, selector } = useWalletSelector();
 
-    const { mutate: acceptOffer } = useAcceptOffer();
+    const { mutate: cancelOffer } = useCancelOffer();
 
-    const acceptOfferOnClick: MouseEventHandler<HTMLButtonElement> = (e) => {
+    const cancelOfferOnClick: MouseEventHandler<HTMLButtonElement> = (e) => {
         e.preventDefault();
 
         if (accountId === null) {
@@ -40,29 +40,40 @@ const AcceptOfferModal = (
             return;
         }
 
-        acceptOffer({ selector, accountId, offer });
+        try {
+            cancelOffer({ selector, accountId, offer });
+        } catch (err) {
+            toast({
+                status: "error",
+                description: "Error cancelling offer",
+                isClosable: true,
+                position: "bottom-right",
+            });
+        }
+
+        onClose();
     };
     return (
         <>
             <Button
                 variant="outline"
-                colorScheme="green"
+                colorScheme="red"
                 size="sm"
                 onClick={onOpen}
                 isDisabled={disabled}
             >
-                Accept Offer
+                Cancel Offer
             </Button>
 
             <Modal isOpen={isOpen} onClose={onClose} size="xl" isCentered>
                 <ModalOverlay />
 
                 <ModalContent>
-                    <ModalHeader>Accept Offer</ModalHeader>
+                    <ModalHeader>Cancel Offer</ModalHeader>
                     <ModalCloseButton />
 
                     <ModalBody>
-                        Do you want to accept this offer?
+                        Do you want to cancel this offer?
                     </ModalBody>
 
                     <ModalFooter>
@@ -74,9 +85,9 @@ const AcceptOfferModal = (
                             <Button
                                 type="submit"
                                 colorScheme="green"
-                                onClick={acceptOfferOnClick}
+                                onClick={cancelOfferOnClick}
                             >
-                                Accept Offer
+                                Cancel Offer
                             </Button>
                         </ButtonGroup>
                     </ModalFooter>
@@ -86,4 +97,4 @@ const AcceptOfferModal = (
     );
 };
 
-export default AcceptOfferModal;
+export default CancelOfferModal;
